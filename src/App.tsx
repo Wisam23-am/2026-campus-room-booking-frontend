@@ -1,25 +1,60 @@
 import React from 'react';
-import logo from './logo.svg';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { LoginPage } from './pages/LoginPage';
+import { UserDashboardPage } from './pages/UserDashboardPage';
+import { BookingListPage } from './pages/BookingListPage';
+import { CreateBookingPage } from './pages/CreateBookingPage';
+import { AdminDashboardPage } from './pages/AdminDashboardPage';
+import { AdminApprovalsPage } from './pages/AdminApprovalsPage';
+import { AdminRoomsPage } from './pages/AdminRoomsPage';
 import './App.css';
 
 function App() {
+  // Check if user is authenticated
+  const isAuthenticated = !!localStorage.getItem('authToken');
+  const userRole = localStorage.getItem('userRole') || 'user';
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* User Routes */}
+        <Route
+          path="/dashboard"
+          element={isAuthenticated ? <UserDashboardPage /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/bookings"
+          element={isAuthenticated ? <BookingListPage /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/bookings/create"
+          element={isAuthenticated ? <CreateBookingPage /> : <Navigate to="/login" />}
+        />
+
+        {/* Admin Routes */}
+        <Route
+          path="/admin/dashboard"
+          element={isAuthenticated && userRole === 'admin' ? <AdminDashboardPage /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/admin/approvals"
+          element={isAuthenticated && userRole === 'admin' ? <AdminApprovalsPage /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/admin/rooms"
+          element={isAuthenticated && userRole === 'admin' ? <AdminRoomsPage /> : <Navigate to="/login" />}
+        />
+
+        {/* Default Route */}
+        <Route path="/" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} />} />
+
+        {/* Catch all */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </Router>
   );
 }
 
