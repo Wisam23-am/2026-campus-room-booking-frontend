@@ -13,7 +13,8 @@ export interface RoomBooking {
   endTime: string;
   status: 0 | 1 | 2;
   createdAt: string;
-  isDeleted: boolean;
+  updatedAt?: string;
+  isDeleted?: boolean;
 }
 
 export interface CreateBookingDto {
