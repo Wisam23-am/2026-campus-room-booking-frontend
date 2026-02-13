@@ -72,6 +72,36 @@ npm start
 
 Aplikasi akan membuka di `http://localhost:3000`
 
+## � Developer Mode (Testing without Login)
+
+Developer mode memungkinkan testing tanpa perlu login. Berguna untuk development lokal cepat.
+
+### Setup Developer Mode
+
+Edit `.env` dan set:
+
+```env
+REACT_APP_DEV_MODE=true
+REACT_APP_DEV_ROLE=user  # atau 'admin'
+```
+
+### Cara Kerja
+
+- Ketika aplikasi dimulai, jika `REACT_APP_DEV_MODE=true`, automatic login dilakukan
+- Default role bisa dikonfigurasi via `REACT_APP_DEV_ROLE`
+- Token dibuat otomatis dengan timestamp (`dev-token-{timestamp}`)
+- Console akan menampilkan: `🔧 Developer Mode: Auto-logged in as user`
+
+### Quick Login pada Login Page (Dev Mode Aktif)
+
+Ketika dev mode aktif, login page menampilkan 2 tombol quick login:
+- 👤 **Login as User** - Quick login dengan role user
+- 👨‍💼 **Login as Admin** - Quick login dengan role admin
+
+Klik tombol untuk instant login tanpa perlu memasukkan credentials.
+
+**⚠️ Catatan**: Developer mode hanya berfungsi di development environment (`NODE_ENV=development`), bukan di production.
+
 ## 📝 Environment Variables
 
 Copy `.env.example` ke `.env` dan sesuaikan:
@@ -79,6 +109,10 @@ Copy `.env.example` ke `.env` dan sesuaikan:
 ```env
 REACT_APP_API_BASE_URL=http://localhost:5168
 REACT_APP_ENVIRONMENT=development
+
+# Developer Mode
+REACT_APP_DEV_MODE=false
+REACT_APP_DEV_ROLE=user
 ```
 
 ## 🔄 API Integration
