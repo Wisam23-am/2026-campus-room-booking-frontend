@@ -16,7 +16,9 @@ export const CreateBookingPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { id, value } = e.currentTarget;
     setFormData((prev) => ({
       ...prev,
@@ -60,7 +62,7 @@ export const CreateBookingPage: React.FC = () => {
       };
 
       const result = await bookingService.createBooking(formattedData);
-      
+
       // Success: redirect to booking list or detail
       navigate(`/bookings/${result.id}`, {
         state: { message: "Booking created successfully!" },
@@ -167,9 +169,7 @@ export const CreateBookingPage: React.FC = () => {
                 <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-4 border border-red-100 dark:border-red-800">
                   <div className="flex">
                     <div className="flex-shrink-0">
-                      <span className="material-icons text-red-400">
-                        error
-                      </span>
+                      <span className="material-icons text-red-400">error</span>
                     </div>
                     <div className="ml-3">
                       <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
