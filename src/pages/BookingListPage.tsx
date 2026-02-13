@@ -1,7 +1,132 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { bookingService } from "../services/booking.service";
+import { BookingQueryParams, RoomBooking } from "../types";
 
 export const BookingListPage: React.FC = () => {
+  const [bookings, setBookings] = useState<RoomBooking[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [searchInput, setSearchInput] = useState<string>("");
+  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "0" | "1" | "2">(
+    "all",
+  );
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize] = useState<number>(10);
+  const [totalCount, setTotalCount] = useState<number>(0);
+
+  useEffect(() => {
+    const debounceId = window.setTimeout(() => {
+      setDebouncedSearch(searchInput.trim());
+      setCurrentPage(1);
+    }, 300);
+
+    return () => window.clearTimeout(debounceId);
+  }, [searchInput]);
+
+  const queryParams: BookingQueryParams = useMemo(() => {
+    const params: BookingQueryParams = {
+      page: currentPage,
+      pageSize,
+    };
+
+    if (debouncedSearch) params.search = debouncedSearch;
+    if (statusFilter !== "all") params.status = Number(statusFilter) as 0 | 1 | 2;
+
+    return params;
+  }, [currentPage, debouncedSearch, pageSize, statusFilter]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadBookings = async (params: BookingQueryParams) => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await bookingService.getBookings(params);
+        if (isCancelled) return;
+
+        setBookings(response.data);
+        setTotalCount(response.totalCount);
+      } catch {
+        if (isCancelled) return;
+        setError("Gagal memuat data booking.");
+      } finally {
+        if (isCancelled) return;
+        setLoading(false);
+      }
+    };
+
+    void loadBookings(queryParams);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [queryParams]);
+
+  const formatDate = (isoString: string): string => {
+    const date = new Date(isoString);
+    if (Number.isNaN(date.getTime())) return "-";
+    return date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+    });
+  };
+
+  const formatTime = (isoString: string): string => {
+    const date = new Date(isoString);
+    if (Number.isNaN(date.getTime())) return "-";
+    return date.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+  };
+
+  const formatDuration = (startIso: string, endIso: string): string => {
+    const start = new Date(startIso);
+    const end = new Date(endIso);
+    const diffMs = end.getTime() - start.getTime();
+    if (Number.isNaN(diffMs) || diffMs <= 0) return "-";
+    const diffMinutes = Math.round(diffMs / 60000);
+    const hours = Math.floor(diffMinutes / 60);
+    const minutes = diffMinutes % 60;
+    if (hours > 0 && minutes === 0) return `${hours} hr${hours > 1 ? "s" : ""}`;
+    if (hours > 0) return `${hours} hr${hours > 1 ? "s" : ""} ${minutes} min`;
+    return `${minutes} min`;
+  };
+
+  const getStatusBadge = (status: 0 | 1 | 2) => {
+    switch (status) {
+      case 1:
+        return {
+          label: "Approved",
+          container:
+            "inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border border-transparent dark:border-green-800",
+          dot: "w-1.5 h-1.5 mr-1.5 bg-green-500 rounded-full",
+        };
+      case 2:
+        return {
+          label: "Rejected",
+          container:
+            "inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 border border-transparent dark:border-red-800",
+          dot: "w-1.5 h-1.5 mr-1.5 bg-red-500 rounded-full",
+        };
+      case 0:
+      default:
+        return {
+          label: "Pending",
+          container:
+            "inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 border border-transparent dark:border-amber-800",
+          dot: "w-1.5 h-1.5 mr-1.5 bg-amber-500 rounded-full animate-pulse",
+        };
+    }
+  };
+
+  const showingFrom = totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const showingTo = totalCount === 0 ? 0 : (currentPage - 1) * pageSize + bookings.length;
+
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-display min-h-screen">
       <nav className="sticky top-0 z-50 bg-white dark:bg-[#1a2634] border-b border-slate-200 dark:border-slate-700 h-16 flex items-center px-6 justify-between shadow-sm">
@@ -96,16 +221,22 @@ export const BookingListPage: React.FC = () => {
                 className="block w-full pl-10 pr-3 py-2 border border-slate-300 dark:border-slate-600 rounded leading-5 bg-white dark:bg-[#101822] placeholder-slate-500 focus:outline-none focus:placeholder-slate-400 focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition-colors"
                 placeholder="Search by room or reference ID..."
                 type="text"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
               />
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto overflow-x-auto pb-1 lg:pb-0">
               <div className="relative min-w-[160px]">
                 <label className="sr-only">Status</label>
-                <select className="block w-full pl-3 pr-10 py-2 text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded dark:bg-[#101822] dark:text-slate-200">
-                  <option>All Statuses</option>
-                  <option>Pending</option>
-                  <option>Approved</option>
-                  <option>Rejected</option>
+                <select
+                  className="block w-full pl-3 pr-10 py-2 text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded dark:bg-[#101822] dark:text-slate-200"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as "all" | "0" | "1" | "2")}
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="0">Pending</option>
+                  <option value="1">Approved</option>
+                  <option value="2">Rejected</option>
                 </select>
               </div>
               <div className="relative min-w-[160px]">
@@ -164,285 +295,101 @@ export const BookingListPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-[#1a2634] divide-y divide-slate-200 dark:divide-slate-700">
-                <tr className="group hover:bg-slate-50 dark:hover:bg-[#151f2b] transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <img
-                          alt="Bright modern office room"
-                          className="h-10 w-10 rounded object-cover"
-                          data-alt="Small modern study room with glass walls"
-                          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFzFcIbWdRxNHWvjd4qCvno2FQM1jLXsKe4qKtiwBtYZVgfW_M4kggUHwMIWP7vMP1CAP0TkhSfkgrWI-CGWEaNSL_0oSTNkzmLCeLzLV5tJURDvhNWd-wlLjYOtoiUdRLRWgt58cPKhGPRrGndP7tvnLAObTtJKZKUSt5kuH91NyXrsUHRkqUIJw1k_NSNa7Cx3PjDGSrPTFZh2Ikw0mRPjK4L2UYvDH2nRjHPgUTmjo4ilExTL2nOLRyi-Yg0Yuw_KwfTYCNNKU"
-                        />
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-slate-900 dark:text-white">
-                          Study Room A
-                        </div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400">
-                          Quiet Zone • 4 Seats
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-slate-900 dark:text-white">
-                      Oct 24, 2023
-                    </div>
-                    <div className="text-sm text-slate-500 dark:text-slate-400">
-                      14:00 - 16:00
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300">
-                      2 hrs
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border border-transparent dark:border-green-800">
-                      <span className="w-1.5 h-1.5 mr-1.5 bg-green-500 rounded-full"></span>
-                      Approved
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        className="text-slate-400 hover:text-primary transition-colors"
-                        title="View Details"
+                {loading ? (
+                  <tr>
+                    <td
+                      className="px-6 py-8 text-center text-sm text-slate-500 dark:text-slate-400"
+                      colSpan={5}
+                    >
+                      Loading...
+                    </td>
+                  </tr>
+                ) : error ? (
+                  <tr>
+                    <td
+                      className="px-6 py-8 text-center text-sm text-red-600 dark:text-red-400"
+                      colSpan={5}
+                    >
+                      {error}
+                    </td>
+                  </tr>
+                ) : bookings.length === 0 ? (
+                  <tr>
+                    <td
+                      className="px-6 py-8 text-center text-sm text-slate-500 dark:text-slate-400"
+                      colSpan={5}
+                    >
+                      Tidak ada booking.
+                    </td>
+                  </tr>
+                ) : (
+                  bookings.map((booking) => {
+                    const badge = getStatusBadge(booking.status);
+                    const roomInitial = booking.roomName?.trim()?.[0]?.toUpperCase() ?? "R";
+
+                    return (
+                      <tr
+                        key={booking.id}
+                        className="group hover:bg-slate-50 dark:hover:bg-[#151f2b] transition-colors"
                       >
-                        <span className="material-icons text-xl">
-                          visibility
-                        </span>
-                      </button>
-                      <button
-                        className="text-slate-400 hover:text-red-500 transition-colors"
-                        title="Cancel Request"
-                      >
-                        <span className="material-icons text-xl">cancel</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr className="group hover:bg-slate-50 dark:hover:bg-[#151f2b] transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10 bg-indigo-100 rounded flex items-center justify-center text-indigo-600 font-bold">
-                        L
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-slate-900 dark:text-white">
-                          Lecture Hall 3
-                        </div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400">
-                          Main Building • 150 Seats
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-slate-900 dark:text-white">
-                      Oct 28, 2023
-                    </div>
-                    <div className="text-sm text-slate-500 dark:text-slate-400">
-                      09:00 - 12:00
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300">
-                      3 hrs
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 border border-transparent dark:border-amber-800">
-                      <span className="w-1.5 h-1.5 mr-1.5 bg-amber-500 rounded-full animate-pulse"></span>
-                      Pending
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        className="text-slate-400 hover:text-primary transition-colors"
-                        title="View Details"
-                      >
-                        <span className="material-icons text-xl">
-                          visibility
-                        </span>
-                      </button>
-                      <button
-                        className="text-slate-400 hover:text-red-500 transition-colors"
-                        title="Cancel Request"
-                      >
-                        <span className="material-icons text-xl">cancel</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr className="group hover:bg-slate-50 dark:hover:bg-[#151f2b] transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <img
-                          alt="Meeting room with round table"
-                          className="h-10 w-10 rounded object-cover"
-                          data-alt="Conference room with a round wooden table"
-                          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcit431l3Qx7eo0D8i-vxzyy0L1gLcHjDr6hj9eUSNWcifWipdz1sls_eyWZ2CJfjmRiINGS8hU2-9Rtm0jifiZ7wZabdb-3zZAL8VQulNYGwEWkYc1uTsPS367hh-5r7NUAhvl4xdtPl6t_3OFbms1JP67Kuv0tPlAVV8n_eu6mZN7pc86OmPfbjzCz81QNz_gkQAIW2ZhjpbbrTDTB3BUn0sAwecwUlE-Uia9ecjfUY94jX5hXKOgaSFDI8W7naRgCBvGLBOP1s"
-                        />
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-slate-900 dark:text-white">
-                          Conf. Room B
-                        </div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400">
-                          Executive Wing • 12 Seats
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-slate-900 dark:text-white">
-                      Oct 29, 2023
-                    </div>
-                    <div className="text-sm text-slate-500 dark:text-slate-400">
-                      10:00 - 11:00
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300">
-                      1 hr
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 border border-transparent dark:border-red-800">
-                      <span className="w-1.5 h-1.5 mr-1.5 bg-red-500 rounded-full"></span>
-                      Rejected
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        className="text-slate-400 hover:text-primary transition-colors"
-                        title="View Details"
-                      >
-                        <span className="material-icons text-xl">
-                          visibility
-                        </span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr className="group hover:bg-slate-50 dark:hover:bg-[#151f2b] transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10 bg-purple-100 rounded flex items-center justify-center text-purple-600 font-bold">
-                        M
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-slate-900 dark:text-white">
-                          Media Lab 2
-                        </div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400">
-                          Creative Hub • 6 Seats
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-slate-900 dark:text-white">
-                      Nov 02, 2023
-                    </div>
-                    <div className="text-sm text-slate-500 dark:text-slate-400">
-                      13:00 - 17:00
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300">
-                      4 hrs
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border border-transparent dark:border-green-800">
-                      <span className="w-1.5 h-1.5 mr-1.5 bg-green-500 rounded-full"></span>
-                      Approved
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        className="text-slate-400 hover:text-primary transition-colors"
-                        title="View Details"
-                      >
-                        <span className="material-icons text-xl">
-                          visibility
-                        </span>
-                      </button>
-                      <button
-                        className="text-slate-400 hover:text-red-500 transition-colors"
-                        title="Cancel Request"
-                      >
-                        <span className="material-icons text-xl">cancel</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr className="group hover:bg-slate-50 dark:hover:bg-[#151f2b] transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <img
-                          alt="Small colorful meeting booth"
-                          className="h-10 w-10 rounded object-cover"
-                          data-alt="Small colorful meeting booth for two people"
-                          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIlGs_AfwXx-x9Xpl_RFqX6ya3u4Ce83ETnaOPBMf4GaT43QyVA6g54mcVcKAa1g50WQNiuxhDwyCCmh4JwlIYeWJBN1gYtgezU3C2rCaQNZQoXYT2MJChgRuRixoUQksQG_ffT-mpgdDTqAqfNd6amO8DwNhmao3ZLexg_jRYmfSJtXf2GMX8afsVrJD2dGT7Xbc10CLOq9u1lTZOlH5i6PiZ2suIqxph7QkstzMsLFt5ceLke7nP5U7AB17GdQ7Qq1o2qzzBAJ0"
-                        />
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-slate-900 dark:text-white">
-                          Focus Pod 1
-                        </div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400">
-                          Library 2F • 1 Seat
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-slate-900 dark:text-white">
-                      Nov 05, 2023
-                    </div>
-                    <div className="text-sm text-slate-500 dark:text-slate-400">
-                      08:00 - 10:00
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300">
-                      2 hrs
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 border border-transparent dark:border-amber-800">
-                      <span className="w-1.5 h-1.5 mr-1.5 bg-amber-500 rounded-full animate-pulse"></span>
-                      Pending
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        className="text-slate-400 hover:text-primary transition-colors"
-                        title="View Details"
-                      >
-                        <span className="material-icons text-xl">
-                          visibility
-                        </span>
-                      </button>
-                      <button
-                        className="text-slate-400 hover:text-red-500 transition-colors"
-                        title="Cancel Request"
-                      >
-                        <span className="material-icons text-xl">cancel</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="flex-shrink-0 h-10 w-10 bg-slate-100 dark:bg-slate-700 rounded flex items-center justify-center text-slate-700 dark:text-slate-200 font-bold">
+                              {roomInitial}
+                            </div>
+                            <div className="ml-4">
+                              <div className="text-sm font-medium text-slate-900 dark:text-white">
+                                {booking.roomName}
+                              </div>
+                              <div className="text-sm text-slate-500 dark:text-slate-400">
+                                Booked by {booking.bookedBy}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-slate-900 dark:text-white">
+                            {formatDate(booking.startTime)}
+                          </div>
+                          <div className="text-sm text-slate-500 dark:text-slate-400">
+                            {formatTime(booking.startTime)} - {formatTime(booking.endTime)}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300">
+                            {formatDuration(booking.startTime, booking.endTime)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={badge.container}>
+                            <span className={badge.dot}></span>
+                            {badge.label}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Link
+                              className="text-slate-400 hover:text-primary transition-colors"
+                              title="View Details"
+                              to={`/bookings/details?id=${booking.id}`}
+                            >
+                              <span className="material-icons text-xl">
+                                visibility
+                              </span>
+                            </Link>
+                            <button
+                              className="text-slate-400 hover:text-red-500 transition-colors"
+                              title="Cancel Request"
+                              type="button"
+                            >
+                              <span className="material-icons text-xl">cancel</span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>
@@ -452,15 +399,15 @@ export const BookingListPage: React.FC = () => {
                 <p className="text-sm text-slate-700 dark:text-slate-400">
                   Showing{" "}
                   <span className="font-medium text-slate-900 dark:text-white">
-                    1
+                    {showingFrom}
                   </span>{" "}
                   to{" "}
                   <span className="font-medium text-slate-900 dark:text-white">
-                    5
+                    {showingTo}
                   </span>{" "}
                   of{" "}
                   <span className="font-medium text-slate-900 dark:text-white">
-                    42
+                    {totalCount}
                   </span>{" "}
                   results
                 </p>
