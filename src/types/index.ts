@@ -24,7 +24,12 @@ export interface CreateBookingDto {
   endTime: string;
 }
 
-export interface UpdateBookingDto extends CreateBookingDto {
+export interface UpdateBookingDto {
+  roomName?: string;
+  bookedBy?: string;
+  purpose?: string;
+  startTime?: string;
+  endTime?: string;
   status?: 0 | 1 | 2;
 }
 
