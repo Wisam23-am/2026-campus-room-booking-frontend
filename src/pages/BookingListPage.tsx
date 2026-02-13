@@ -34,7 +34,8 @@ export const BookingListPage: React.FC = () => {
     };
 
     if (debouncedSearch) params.search = debouncedSearch;
-    if (statusFilter !== "all") params.status = Number(statusFilter) as 0 | 1 | 2;
+    if (statusFilter !== "all")
+      params.status = Number(statusFilter) as 0 | 1 | 2;
 
     return params;
   }, [currentPage, debouncedSearch, pageSize, statusFilter]);
@@ -81,7 +82,10 @@ export const BookingListPage: React.FC = () => {
   const formatTime = (isoString: string): string => {
     const date = new Date(isoString);
     if (Number.isNaN(date.getTime())) return "-";
-    return date.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+    return date.toLocaleTimeString(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   const formatDuration = (startIso: string, endIso: string): string => {
@@ -125,7 +129,8 @@ export const BookingListPage: React.FC = () => {
   };
 
   const showingFrom = totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1;
-  const showingTo = totalCount === 0 ? 0 : (currentPage - 1) * pageSize + bookings.length;
+  const showingTo =
+    totalCount === 0 ? 0 : (currentPage - 1) * pageSize + bookings.length;
 
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-display min-h-screen">
@@ -231,7 +236,9 @@ export const BookingListPage: React.FC = () => {
                 <select
                   className="block w-full pl-3 pr-10 py-2 text-base border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded dark:bg-[#101822] dark:text-slate-200"
                   value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value as "all" | "0" | "1" | "2")}
+                  onChange={(e) =>
+                    setStatusFilter(e.target.value as "all" | "0" | "1" | "2")
+                  }
                 >
                   <option value="all">All Statuses</option>
                   <option value="0">Pending</option>
@@ -325,7 +332,8 @@ export const BookingListPage: React.FC = () => {
                 ) : (
                   bookings.map((booking) => {
                     const badge = getStatusBadge(booking.status);
-                    const roomInitial = booking.roomName?.trim()?.[0]?.toUpperCase() ?? "R";
+                    const roomInitial =
+                      booking.roomName?.trim()?.[0]?.toUpperCase() ?? "R";
 
                     return (
                       <tr
@@ -352,7 +360,8 @@ export const BookingListPage: React.FC = () => {
                             {formatDate(booking.startTime)}
                           </div>
                           <div className="text-sm text-slate-500 dark:text-slate-400">
-                            {formatTime(booking.startTime)} - {formatTime(booking.endTime)}
+                            {formatTime(booking.startTime)} -{" "}
+                            {formatTime(booking.endTime)}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -382,7 +391,9 @@ export const BookingListPage: React.FC = () => {
                               title="Cancel Request"
                               type="button"
                             >
-                              <span className="material-icons text-xl">cancel</span>
+                              <span className="material-icons text-xl">
+                                cancel
+                              </span>
                             </button>
                           </div>
                         </td>
