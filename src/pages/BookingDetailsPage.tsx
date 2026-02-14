@@ -159,6 +159,7 @@ export const BookingDetailsPage: React.FC = () => {
   };
 
   return (
+    <>
       <nav className="bg-white dark:bg-[#1A2633] border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
@@ -498,6 +499,8 @@ export const BookingDetailsPage: React.FC = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
         </div>
       </main>
       <footer className="bg-white dark:bg-[#1A2633] border-t border-slate-200 dark:border-slate-800">
@@ -507,6 +510,6 @@ export const BookingDetailsPage: React.FC = () => {
           </p>
         </div>
       </footer>
-    </div>
+    </>
   );
 };
