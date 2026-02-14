@@ -22,7 +22,7 @@ export const AdminRejectReasonModalPage: React.FC = () => {
             </span>
             <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden relative">
               <img
-                alt="Admin Profile Picture"
+                alt="Admin profile"
                 className="w-full h-full object-cover"
                 data-alt="Smiling man in business casual"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2KDMmADTgm9VCR4VxCgQay1vBLxtN8ScAEzB8g00B0yvosotMDZufzyTKw0IhF0Zn2fvntdZr2TYNXwZVM98YcQWlb_aI4IBddMhkr0GHhUWq0QthGLoAKQn4xDbbV3PvURD0O3PEtdNNhZX9CTgGZtxrvI6JzaCLj5CMBfebKxVtWAftiNkFOokgTs66hxRM0HzSUpgY2t5tN-pt_mzgAdqe8OpjsbcB4wgcievLUGrKgaimUCSW2rd5WTnaaQDZw1t8iuyOtRM"

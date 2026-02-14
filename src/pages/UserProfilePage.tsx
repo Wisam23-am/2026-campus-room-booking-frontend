@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { userService } from "../services/user.service";
 import { authService } from "../services/auth.service";
 import { User } from "../types";
 
 export const UserProfilePage: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [user, setUser] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<User | null>(null);
@@ -35,6 +37,10 @@ export const UserProfilePage: React.FC = () => {
     fetchUserProfile();
   }, []);
 
+  useEffect(() => {
+    setIsEditing(location.pathname === "/profile/edit");
+  }, [location.pathname]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (formData) {
@@ -53,6 +59,7 @@ export const UserProfilePage: React.FC = () => {
       setIsEditing(false);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
+      navigate("/profile");
     } catch (err) {
       console.error("Failed to update profile:", err);
       setError("Gagal memperbarui profil");
@@ -64,12 +71,20 @@ export const UserProfilePage: React.FC = () => {
   const handleCancel = () => {
     setFormData(user);
     setIsEditing(false);
+    navigate("/profile");
+  };
+
+  const handleLogout = () => {
+    authService.logout();
+    navigate("/login");
   };
 
   if (loading) {
     return (
       <div className="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center">
-        <div className="text-slate-600 dark:text-slate-400">Memuat profil...</div>
+        <div className="text-slate-600 dark:text-slate-400">
+          Memuat profil...
+        </div>
       </div>
     );
   }
@@ -77,7 +92,9 @@ export const UserProfilePage: React.FC = () => {
   if (!user || !formData) {
     return (
       <div className="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center">
-        <div className="text-slate-600 dark:text-slate-400">Profil tidak ditemukan</div>
+        <div className="text-slate-600 dark:text-slate-400">
+          Profil tidak ditemukan
+        </div>
       </div>
     );
   }
@@ -113,7 +130,7 @@ export const UserProfilePage: React.FC = () => {
           </Link>
           <Link
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-primary transition-colors group"
-            to="/rooms/schedule"
+            to="/rooms"
           >
             <span className="material-icons-outlined text-[20px] group-hover:text-primary transition-colors">
               search
@@ -234,26 +251,26 @@ export const UserProfilePage: React.FC = () => {
                   </div>
 
                   <div className="flex-1 pt-2 md:pt-0">
-                  <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-1">
-                    <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
-                      {user.fullName}
-                    </h2>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20 self-start md:self-auto">
-                      {roleDisplay}
-                    </span>
-                  </div>
-                  <p className="text-slate-500 dark:text-slate-400 flex items-center gap-1 text-sm md:text-base">
-                    <span className="material-icons-outlined text-sm">
-                      school
-                    </span>
-                    Pengguna
-                  </p>
+                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-1">
+                      <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
+                        {user.fullName}
+                      </h2>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20 self-start md:self-auto">
+                        {roleDisplay}
+                      </span>
+                    </div>
+                    <p className="text-slate-500 dark:text-slate-400 flex items-center gap-1 text-sm md:text-base">
+                      <span className="material-icons-outlined text-sm">
+                        school
+                      </span>
+                      Pengguna
+                    </p>
                   </div>
 
                   <div className="hidden md:block pb-1">
                     {!isEditing ? (
                       <button
-                        onClick={() => setIsEditing(true)}
+                        onClick={() => navigate("/profile/edit")}
                         className="bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium text-sm"
                       >
                         <span className="material-icons-outlined text-lg">
@@ -346,7 +363,7 @@ export const UserProfilePage: React.FC = () => {
                         Diproduksi
                       </label>
                       <div className="text-slate-900 dark:text-white font-medium">
-                        {new Date(user.createdAt).toLocaleDateString('id-ID')}
+                        {new Date(user.createdAt).toLocaleDateString("id-ID")}
                       </div>
                     </div>
                     <div className="space-y-1">
@@ -363,7 +380,7 @@ export const UserProfilePage: React.FC = () => {
                 <div className="md:hidden">
                   {!isEditing ? (
                     <button
-                      onClick={() => setIsEditing(true)}
+                      onClick={() => navigate("/profile/edit")}
                       className="w-full bg-primary hover:bg-primary-dark text-white px-4 py-3 rounded-lg shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 font-medium"
                     >
                       <span className="material-icons-outlined text-lg">
@@ -407,14 +424,17 @@ export const UserProfilePage: React.FC = () => {
                     Keamanan Akun
                   </h3>
                   <div className="space-y-3">
-                    <button className="w-full flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-primary/50 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group">
+                    <Link
+                      className="w-full flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-primary/50 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group"
+                      to="/profile/security"
+                    >
                       <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-primary transition-colors">
                         Ubah Kata Sandi
                       </span>
                       <span className="material-icons-outlined text-slate-400 text-lg group-hover:text-primary transition-colors">
                         chevron_right
                       </span>
-                    </button>
+                    </Link>
                     <button className="w-full flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-primary/50 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group">
                       <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-primary transition-colors">
                         Autentikasi 2-Faktor
@@ -440,7 +460,11 @@ export const UserProfilePage: React.FC = () => {
                     Keluar dari sesi ini akan mengharuskan Anda untuk login
                     kembali untuk mengakses booking.
                   </p>
-                  <button className="w-full bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 px-4 py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 font-medium text-sm">
+                  <button
+                    className="w-full bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 px-4 py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 font-medium text-sm"
+                    onClick={handleLogout}
+                    type="button"
+                  >
                     <span className="material-icons-outlined text-lg">
                       logout
                     </span>

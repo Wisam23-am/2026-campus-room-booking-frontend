@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { bookingService } from "../services/booking.service";
 import { roomService } from "../services/room.service";
-import { RoomBooking, Room } from "../types";
+import { RoomBooking } from "../types";
 
 export const AdminDashboardPage: React.FC = () => {
   const [stats, setStats] = useState({
@@ -34,31 +34,38 @@ export const AdminDashboardPage: React.FC = () => {
       const allRooms = roomsRes.data || [];
 
       // Calculate stats
-      const pending = allBookings.filter((b) => b.status === "Pending").length;
-      const completed = allBookings.filter(
-        (b) => b.status === "Approved" || b.status === "Completed"
-      ).length;
-      const rejected = allBookings.filter((b) => b.status === "Rejected").length;
+      const pending = allBookings.filter((b) => b.status === 0).length;
+      const completed = allBookings.filter((b) => b.status === 1).length;
+      const rejected = allBookings.filter((b) => b.status === 2).length;
       const total = allBookings.length;
-      const rejectionRate = total > 0 ? ((rejected / total) * 100).toFixed(1) : 0;
+      const rejectionRate = total > 0 ? (rejected / total) * 100 : 0;
 
       // Calculate occupancy rate (booked rooms / total rooms * 100)
-      const bookedRoomIds = new Set(allBookings.map((b) => b.roomId));
-      const occupancyRate = allRooms.length > 0
-        ? ((bookedRoomIds.size / allRooms.length) * 100).toFixed(1)
-        : 0;
+      const bookedRoomNames = new Set(
+        allBookings
+          .filter((b) => b.status === 1)
+          .map((b) => b.roomName)
+          .filter((name) => Boolean(name)),
+      );
+      const occupancyRate =
+        allRooms.length > 0
+          ? (bookedRoomNames.size / allRooms.length) * 100
+          : 0;
 
       setStats({
-        occupancyRate: parseFloat(occupancyRate as string),
+        occupancyRate: Number(occupancyRate.toFixed(1)),
         pendingApprovals: pending,
         completedBookings: completed,
-        rejectionRate: parseFloat(rejectionRate as string),
+        rejectionRate: Number(rejectionRate.toFixed(1)),
       });
 
       // Get recent completed bookings (limit 5)
       const recent = allBookings
-        .filter((b) => b.status === "Approved")
-        .sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime())
+        .filter((b) => b.status === 1)
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        )
         .slice(0, 5);
       setRecentBookings(recent);
     } catch (err: any) {
@@ -69,33 +76,42 @@ export const AdminDashboardPage: React.FC = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: 0 | 1 | 2) => {
     switch (status) {
-      case "Pending":
+      case 0:
         return "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300 border border-orange-200 dark:border-orange-800/50";
-      case "Approved":
+      case 1:
         return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800/50";
-      case "Rejected":
+      case 2:
         return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 border border-red-200 dark:border-red-800/50";
-      case "Completed":
-        return "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600";
       default:
         return "bg-slate-100 text-slate-600";
     }
   };
 
-  const getStatusDotColor = (status: string) => {
+  const getStatusDotColor = (status: 0 | 1 | 2) => {
     switch (status) {
-      case "Pending":
+      case 0:
         return "bg-orange-500";
-      case "Approved":
+      case 1:
         return "bg-green-500";
-      case "Rejected":
+      case 2:
         return "bg-red-500";
-      case "Completed":
-        return "bg-slate-400";
       default:
         return "bg-slate-400";
+    }
+  };
+
+  const getStatusLabel = (status: 0 | 1 | 2) => {
+    switch (status) {
+      case 0:
+        return "Pending";
+      case 1:
+        return "Approved";
+      case 2:
+        return "Rejected";
+      default:
+        return "Unknown";
     }
   };
   return (
@@ -178,7 +194,7 @@ export const AdminDashboardPage: React.FC = () => {
           <div className="flex items-center gap-3">
             <Link to="/profile" aria-label="Profile">
               <img
-                alt="Profile picture of an administrator"
+                alt="Administrator profile"
                 className="h-10 w-10 rounded-full object-cover border border-slate-200 dark:border-slate-700"
                 data-alt="Profile picture of an administrator"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQ6cce0AuMviIi8ITIHeKkgqf70oFreYvKP6Umfnwi9SMAAXrnuBgGeEMHxpVSL7dpNmlpRkQX-M0NbWAalxqAJ-edaDUtBFJuSumy0Bg7OwmgQYqeyDTrivNIBX4ZMtzssaNGgH-XSpKbN2nlXlNI0bMWobzs9UWSIOA_hNj8op3FM8ClQiPxVU9bppoy2SYRGv1Z-ILl4pWpbVGL5vgHuw1Jrj_aFN-397wKfZGVSF8VZh1kr91HfUZEPM1TkPY40lFINXnImq8"
@@ -318,87 +334,6 @@ export const AdminDashboardPage: React.FC = () => {
               </p>
             </div>
           </div>
-                    pie_chart
-                  </span>
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-xs">
-                <span className="text-green-600 font-medium flex items-center">
-                  <span className="material-icons-round text-sm mr-0.5">
-                    trending_up
-                  </span>
-                  +5%
-                </span>
-                <span className="text-slate-400 ml-2">vs yesterday</span>
-              </div>
-            </div>
-            <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-                    Requests Today
-                  </p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    125
-                  </h3>
-                </div>
-                <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg text-indigo-600">
-                  <span className="material-icons-outlined text-xl">inbox</span>
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-xs">
-                <span className="text-green-600 font-medium flex items-center">
-                  <span className="material-icons-round text-sm mr-0.5">
-                    trending_up
-                  </span>
-                  +12%
-                </span>
-                <span className="text-slate-400 ml-2">vs last week</span>
-              </div>
-            </div>
-            <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-amber-500">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-                    Pending Approvals
-                  </p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    14
-                  </h3>
-                </div>
-                <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-amber-600">
-                  <span className="material-icons-outlined text-xl">
-                    pending_actions
-                  </span>
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-xs">
-                <span className="text-amber-600 font-medium">
-                  Requires action
-                </span>
-              </div>
-            </div>
-            <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-                    Active Alerts
-                  </p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    2
-                  </h3>
-                </div>
-                <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-600">
-                  <span className="material-icons-outlined text-xl">
-                    warning_amber
-                  </span>
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-xs">
-                <span className="text-slate-500">Maintenance required</span>
-              </div>
-            </div>
-          </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 bg-white dark:bg-[#151f2b] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
               <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
@@ -446,14 +381,14 @@ export const AdminDashboardPage: React.FC = () => {
                           <td className="px-6 py-4">
                             <div className="flex items-center">
                               <div className="h-8 w-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold mr-3">
-                                {booking.userId?.charAt(0).toUpperCase()}
+                                {booking.bookedBy.charAt(0).toUpperCase()}
                               </div>
                               <div>
                                 <div className="font-medium text-slate-900 dark:text-white">
-                                  User {booking.userId?.substring(0, 4)}
+                                  {booking.bookedBy}
                                 </div>
                                 <div className="text-xs text-slate-500">
-                                  {booking.userId}
+                                  Booking #{booking.id}
                                 </div>
                               </div>
                             </div>
@@ -468,23 +403,26 @@ export const AdminDashboardPage: React.FC = () => {
                           </td>
                           <td className="px-6 py-4 text-slate-600 dark:text-slate-400 whitespace-nowrap">
                             {new Date(booking.startTime).toLocaleDateString()},{" "}
-                            {new Date(booking.startTime).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+                            {new Date(booking.startTime).toLocaleTimeString(
+                              [],
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              },
+                            )}
                           </td>
                           <td className="px-6 py-4 text-right">
                             <span
                               className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                                booking.status
+                                booking.status,
                               )}`}
                             >
                               <span
                                 className={`w-1.5 h-1.5 rounded-full ${getStatusDotColor(
-                                  booking.status
+                                  booking.status,
                                 )} mr-1.5`}
                               ></span>
-                              {booking.status}
+                              {getStatusLabel(booking.status)}
                             </span>
                           </td>
                         </tr>
@@ -493,33 +431,6 @@ export const AdminDashboardPage: React.FC = () => {
                   </table>
                 </div>
               )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                        Oct 25, 9:00 AM
-                      </td>
-                      <td className="px-6 py-4 text-right space-x-2">
-                        <button
-                          className="inline-flex items-center justify-center h-8 w-8 rounded bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
-                          title="Reject"
-                        >
-                          <span className="material-icons-outlined text-lg">
-                            close
-                          </span>
-                        </button>
-                        <button
-                          className="inline-flex items-center justify-center h-8 w-8 rounded bg-primary text-white hover:bg-blue-600 shadow-sm transition-colors"
-                          title="Approve"
-                        >
-                          <span className="material-icons-outlined text-lg">
-                            check
-                          </span>
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
             </div>
             <div className="bg-white dark:bg-[#151f2b] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 flex flex-col">
               <h2 className="font-bold text-slate-900 dark:text-white mb-6">
