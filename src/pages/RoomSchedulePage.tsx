@@ -24,23 +24,29 @@ export const RoomSchedulePage: React.FC = () => {
                   Dashboard
                 </Link>
                 <Link
-                  className="border-primary text-slate-900 dark:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                  className="border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                  to="/rooms"
+                >
+                  Daftar Ruangan
+                </Link>
+                <Link
+                  className="border-primary text-slate-700 dark:text-slate-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                   to="/rooms/schedule"
                 >
-                  Buildings
+                  Jadwal Saya
                 </Link>
                 <Link
                   className="border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                   to="/bookings"
                 >
-                  My Bookings
+                  Riwayat Booking
                 </Link>
               </div>
             </div>
             <div className="flex items-center gap-4">
               <Link
                 className="bg-primary text-white px-4 py-2 rounded text-sm font-medium hover:bg-primary-dark transition-colors shadow-sm"
-                to="/bookings/create"
+                to="/booking/create"
               >
                 Create Booking
               </Link>

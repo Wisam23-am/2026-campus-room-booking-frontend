@@ -1,7 +1,119 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { bookingService } from "../services/booking.service";
+import { roomService } from "../services/room.service";
+import { RoomBooking } from "../types";
 
 export const AdminDashboardPage: React.FC = () => {
+  const [stats, setStats] = useState({
+    occupancyRate: 0,
+    pendingApprovals: 0,
+    completedBookings: 0,
+    rejectionRate: 0,
+  });
+  const [recentBookings, setRecentBookings] = useState<RoomBooking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Fetch all bookings and rooms in parallel
+      const [bookingsRes, roomsRes] = await Promise.all([
+        bookingService.getBookings({}),
+        roomService.getRooms({}),
+      ]);
+
+      const allBookings = bookingsRes.data || [];
+      const allRooms = roomsRes.data || [];
+
+      // Calculate stats
+      const pending = allBookings.filter((b) => b.status === 0).length;
+      const completed = allBookings.filter((b) => b.status === 1).length;
+      const rejected = allBookings.filter((b) => b.status === 2).length;
+      const total = allBookings.length;
+      const rejectionRate = total > 0 ? (rejected / total) * 100 : 0;
+
+      // Calculate occupancy rate (booked rooms / total rooms * 100)
+      const bookedRoomNames = new Set(
+        allBookings
+          .filter((b) => b.status === 1)
+          .map((b) => b.roomName)
+          .filter((name) => Boolean(name)),
+      );
+      const occupancyRate =
+        allRooms.length > 0
+          ? (bookedRoomNames.size / allRooms.length) * 100
+          : 0;
+
+      setStats({
+        occupancyRate: Number(occupancyRate.toFixed(1)),
+        pendingApprovals: pending,
+        completedBookings: completed,
+        rejectionRate: Number(rejectionRate.toFixed(1)),
+      });
+
+      // Get recent completed bookings (limit 5)
+      const recent = allBookings
+        .filter((b) => b.status === 1)
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        )
+        .slice(0, 5);
+      setRecentBookings(recent);
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch dashboard data");
+      console.error("Error fetching dashboard data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusColor = (status: 0 | 1 | 2) => {
+    switch (status) {
+      case 0:
+        return "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300 border border-orange-200 dark:border-orange-800/50";
+      case 1:
+        return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800/50";
+      case 2:
+        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 border border-red-200 dark:border-red-800/50";
+      default:
+        return "bg-slate-100 text-slate-600";
+    }
+  };
+
+  const getStatusDotColor = (status: 0 | 1 | 2) => {
+    switch (status) {
+      case 0:
+        return "bg-orange-500";
+      case 1:
+        return "bg-green-500";
+      case 2:
+        return "bg-red-500";
+      default:
+        return "bg-slate-400";
+    }
+  };
+
+  const getStatusLabel = (status: 0 | 1 | 2) => {
+    switch (status) {
+      case 0:
+        return "Pending";
+      case 1:
+        return "Approved";
+      case 2:
+        return "Rejected";
+      default:
+        return "Unknown";
+    }
+  };
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-display min-h-screen flex flex-col md:flex-row antialiased overflow-hidden">
       <aside className="w-full md:w-64 bg-white dark:bg-[#151f2b] border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 flex flex-col z-20 flex-shrink-0">
@@ -82,7 +194,7 @@ export const AdminDashboardPage: React.FC = () => {
           <div className="flex items-center gap-3">
             <Link to="/profile" aria-label="Profile">
               <img
-                alt="Profile picture of an administrator"
+                alt="Administrator profile"
                 className="h-10 w-10 rounded-full object-cover border border-slate-200 dark:border-slate-700"
                 data-alt="Profile picture of an administrator"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQ6cce0AuMviIi8ITIHeKkgqf70oFreYvKP6Umfnwi9SMAAXrnuBgGeEMHxpVSL7dpNmlpRkQX-M0NbWAalxqAJ-edaDUtBFJuSumy0Bg7OwmgQYqeyDTrivNIBX4ZMtzssaNGgH-XSpKbN2nlXlNI0bMWobzs9UWSIOA_hNj8op3FM8ClQiPxVU9bppoy2SYRGv1Z-ILl4pWpbVGL5vgHuw1Jrj_aFN-397wKfZGVSF8VZh1kr91HfUZEPM1TkPY40lFINXnImq8"
@@ -135,6 +247,11 @@ export const AdminDashboardPage: React.FC = () => {
           </div>
         </header>
         <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 space-y-6">
+          {error && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-red-600 dark:text-red-300">
+              {error}
+            </div>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex justify-between items-start">
@@ -143,97 +260,85 @@ export const AdminDashboardPage: React.FC = () => {
                     Occupancy Rate
                   </p>
                   <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    82%
+                    {loading ? "..." : `${stats.occupancyRate.toFixed(1)}%`}
                   </h3>
                 </div>
                 <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-primary">
                   <span className="material-icons-outlined text-xl">
-                    pie_chart
+                    trending_up
                   </span>
                 </div>
               </div>
-              <div className="mt-4 flex items-center text-xs">
-                <span className="text-green-600 font-medium flex items-center">
-                  <span className="material-icons-round text-sm mr-0.5">
-                    trending_up
-                  </span>
-                  +5%
-                </span>
-                <span className="text-slate-400 ml-2">vs yesterday</span>
-              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                Rooms in use
+              </p>
             </div>
             <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-                    Requests Today
-                  </p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    125
-                  </h3>
-                </div>
-                <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg text-indigo-600">
-                  <span className="material-icons-outlined text-xl">inbox</span>
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-xs">
-                <span className="text-green-600 font-medium flex items-center">
-                  <span className="material-icons-round text-sm mr-0.5">
-                    trending_up
-                  </span>
-                  +12%
-                </span>
-                <span className="text-slate-400 ml-2">vs last week</span>
-              </div>
-            </div>
-            <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-amber-500">
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
                     Pending Approvals
                   </p>
                   <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    14
+                    {loading ? "..." : stats.pendingApprovals}
                   </h3>
                 </div>
-                <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-amber-600">
+                <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg text-orange-500">
                   <span className="material-icons-outlined text-xl">
-                    pending_actions
+                    hourglass_empty
                   </span>
                 </div>
               </div>
-              <div className="mt-4 flex items-center text-xs">
-                <span className="text-amber-600 font-medium">
-                  Requires action
-                </span>
-              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                Waiting for review
+              </p>
             </div>
             <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-                    Active Alerts
+                    Completed Bookings
                   </p>
                   <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    2
+                    {loading ? "..." : stats.completedBookings}
                   </h3>
                 </div>
-                <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-600">
+                <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg text-green-500">
                   <span className="material-icons-outlined text-xl">
-                    warning_amber
+                    check_circle
                   </span>
                 </div>
               </div>
-              <div className="mt-4 flex items-center text-xs">
-                <span className="text-slate-500">Maintenance required</span>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                Successfully completed
+              </p>
+            </div>
+            <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                    Rejection Rate
+                  </p>
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+                    {loading ? "..." : `${stats.rejectionRate.toFixed(1)}%`}
+                  </h3>
+                </div>
+                <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-500">
+                  <span className="material-icons-outlined text-xl">
+                    cancel
+                  </span>
+                </div>
               </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                Denied requests
+              </p>
             </div>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 bg-white dark:bg-[#151f2b] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
               <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
                 <h2 className="font-bold text-slate-900 dark:text-white">
-                  Pending Approvals
+                  Recent Approved Bookings
                 </h2>
                 <Link
                   className="text-sm font-medium text-primary hover:text-blue-600 transition-colors"
@@ -242,158 +347,90 @@ export const AdminDashboardPage: React.FC = () => {
                   View All
                 </Link>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider font-semibold">
-                    <tr>
-                      <th className="px-6 py-3">Requester</th>
-                      <th className="px-6 py-3">Room &amp; Details</th>
-                      <th className="px-6 py-3">Date</th>
-                      <th className="px-6 py-3 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <div className="h-8 w-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold mr-3">
-                            JD
-                          </div>
-                          <div>
+              {loading ? (
+                <div className="p-8 text-center">
+                  <div className="w-8 h-8 border-4 border-slate-200 dark:border-slate-700 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-slate-500 dark:text-slate-400">
+                    Loading bookings...
+                  </p>
+                </div>
+              ) : recentBookings.length === 0 ? (
+                <div className="p-8 text-center">
+                  <span className="material-icons text-slate-300 text-3xl block mb-2">
+                    event_busy
+                  </span>
+                  <p className="text-slate-500">No recent bookings</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider font-semibold">
+                      <tr>
+                        <th className="px-6 py-3">User</th>
+                        <th className="px-6 py-3">Room &amp; Purpose</th>
+                        <th className="px-6 py-3">Date & Time</th>
+                        <th className="px-6 py-3 text-right">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                      {recentBookings.map((booking) => (
+                        <tr
+                          key={booking.id}
+                          className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                        >
+                          <td className="px-6 py-4">
+                            <div className="flex items-center">
+                              <div className="h-8 w-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold mr-3">
+                                {booking.bookedBy.charAt(0).toUpperCase()}
+                              </div>
+                              <div>
+                                <div className="font-medium text-slate-900 dark:text-white">
+                                  {booking.bookedBy}
+                                </div>
+                                <div className="text-xs text-slate-500">
+                                  Booking #{booking.id}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
                             <div className="font-medium text-slate-900 dark:text-white">
-                              John Doe
+                              {booking.roomName || "Room"}
                             </div>
                             <div className="text-xs text-slate-500">
-                              Faculty
+                              {booking.purpose || "-"}
                             </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-slate-900 dark:text-white">
-                          Lecture Hall A
-                        </div>
-                        <div className="text-xs text-slate-500">
-                          CS 101 Lecture
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                        Today, 2:00 PM
-                      </td>
-                      <td className="px-6 py-4 text-right space-x-2">
-                        <button
-                          className="inline-flex items-center justify-center h-8 w-8 rounded bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
-                          title="Reject"
-                        >
-                          <span className="material-icons-outlined text-lg">
-                            close
-                          </span>
-                        </button>
-                        <button
-                          className="inline-flex items-center justify-center h-8 w-8 rounded bg-primary text-white hover:bg-blue-600 shadow-sm transition-colors"
-                          title="Approve"
-                        >
-                          <span className="material-icons-outlined text-lg">
-                            check
-                          </span>
-                        </button>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <div className="h-8 w-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-bold mr-3">
-                            RC
-                          </div>
-                          <div>
-                            <div className="font-medium text-slate-900 dark:text-white">
-                              Robotics Club
-                            </div>
-                            <div className="text-xs text-slate-500">
-                              Student Org
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-slate-900 dark:text-white">
-                          Lab 304
-                        </div>
-                        <div className="text-xs text-slate-500">
-                          Project Build
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                        Oct 24, 5:00 PM
-                      </td>
-                      <td className="px-6 py-4 text-right space-x-2">
-                        <button
-                          className="inline-flex items-center justify-center h-8 w-8 rounded bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
-                          title="Reject"
-                        >
-                          <span className="material-icons-outlined text-lg">
-                            close
-                          </span>
-                        </button>
-                        <button
-                          className="inline-flex items-center justify-center h-8 w-8 rounded bg-primary text-white hover:bg-blue-600 shadow-sm transition-colors"
-                          title="Approve"
-                        >
-                          <span className="material-icons-outlined text-lg">
-                            check
-                          </span>
-                        </button>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <div className="h-8 w-8 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-xs font-bold mr-3">
-                            AS
-                          </div>
-                          <div>
-                            <div className="font-medium text-slate-900 dark:text-white">
-                              Sarah Smith
-                            </div>
-                            <div className="text-xs text-slate-500">
-                              Administration
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-slate-900 dark:text-white">
-                          Conf Room B
-                        </div>
-                        <div className="text-xs text-slate-500">
-                          Board Meeting
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                        Oct 25, 9:00 AM
-                      </td>
-                      <td className="px-6 py-4 text-right space-x-2">
-                        <button
-                          className="inline-flex items-center justify-center h-8 w-8 rounded bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
-                          title="Reject"
-                        >
-                          <span className="material-icons-outlined text-lg">
-                            close
-                          </span>
-                        </button>
-                        <button
-                          className="inline-flex items-center justify-center h-8 w-8 rounded bg-primary text-white hover:bg-blue-600 shadow-sm transition-colors"
-                          title="Approve"
-                        >
-                          <span className="material-icons-outlined text-lg">
-                            check
-                          </span>
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+                          </td>
+                          <td className="px-6 py-4 text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                            {new Date(booking.startTime).toLocaleDateString()},{" "}
+                            {new Date(booking.startTime).toLocaleTimeString(
+                              [],
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              },
+                            )}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                                booking.status,
+                              )}`}
+                            >
+                              <span
+                                className={`w-1.5 h-1.5 rounded-full ${getStatusDotColor(
+                                  booking.status,
+                                )} mr-1.5`}
+                              ></span>
+                              {getStatusLabel(booking.status)}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
             <div className="bg-white dark:bg-[#151f2b] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 flex flex-col">
               <h2 className="font-bold text-slate-900 dark:text-white mb-6">

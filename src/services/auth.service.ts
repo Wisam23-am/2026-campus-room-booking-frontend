@@ -2,7 +2,7 @@ import axios from 'axios';
 import { User } from '../types';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5168';
-const AUTH_TOKEN_KEY = 'auth_token';
+const AUTH_TOKEN_KEY = 'authToken';
 const CURRENT_USER_KEY = 'current_user';
 
 export const authService = {

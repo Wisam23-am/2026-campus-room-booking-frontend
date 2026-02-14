@@ -21,14 +21,14 @@ export const LoginPage: React.FC = () => {
     setLoading(true);
 
     try {
-      await authService.login(email, password);
+      const { user } = await authService.login(email, password);
 
       if (rememberMe) {
         localStorage.setItem("remember_email", email);
       }
 
-      // Redirect to bookings page
-      navigate("/bookings");
+      // Redirect after login
+      navigate(user.role === 1 ? "/admin/dashboard" : "/dashboard");
     } catch (err: any) {
       setError(err.message || "Login gagal. Silakan coba lagi.");
     } finally {

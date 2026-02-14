@@ -1,7 +1,14 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const RegisterPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    navigate("/verify-email");
+  };
+
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-100 min-h-screen flex items-center justify-center p-4">
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
@@ -64,7 +71,7 @@ export const RegisterPage: React.FC = () => {
                 Lengkapi data diri Anda untuk memulai reservasi.
               </p>
             </div>
-            <form action="#" className="space-y-6">
+            <form action="#" className="space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label
                   className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5"
