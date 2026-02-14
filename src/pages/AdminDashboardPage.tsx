@@ -1,7 +1,103 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { bookingService } from "../services/booking.service";
+import { roomService } from "../services/room.service";
+import { RoomBooking, Room } from "../types";
 
 export const AdminDashboardPage: React.FC = () => {
+  const [stats, setStats] = useState({
+    occupancyRate: 0,
+    pendingApprovals: 0,
+    completedBookings: 0,
+    rejectionRate: 0,
+  });
+  const [recentBookings, setRecentBookings] = useState<RoomBooking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Fetch all bookings and rooms in parallel
+      const [bookingsRes, roomsRes] = await Promise.all([
+        bookingService.getBookings({}),
+        roomService.getRooms({}),
+      ]);
+
+      const allBookings = bookingsRes.data || [];
+      const allRooms = roomsRes.data || [];
+
+      // Calculate stats
+      const pending = allBookings.filter((b) => b.status === "Pending").length;
+      const completed = allBookings.filter(
+        (b) => b.status === "Approved" || b.status === "Completed"
+      ).length;
+      const rejected = allBookings.filter((b) => b.status === "Rejected").length;
+      const total = allBookings.length;
+      const rejectionRate = total > 0 ? ((rejected / total) * 100).toFixed(1) : 0;
+
+      // Calculate occupancy rate (booked rooms / total rooms * 100)
+      const bookedRoomIds = new Set(allBookings.map((b) => b.roomId));
+      const occupancyRate = allRooms.length > 0
+        ? ((bookedRoomIds.size / allRooms.length) * 100).toFixed(1)
+        : 0;
+
+      setStats({
+        occupancyRate: parseFloat(occupancyRate as string),
+        pendingApprovals: pending,
+        completedBookings: completed,
+        rejectionRate: parseFloat(rejectionRate as string),
+      });
+
+      // Get recent completed bookings (limit 5)
+      const recent = allBookings
+        .filter((b) => b.status === "Approved")
+        .sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime())
+        .slice(0, 5);
+      setRecentBookings(recent);
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch dashboard data");
+      console.error("Error fetching dashboard data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Pending":
+        return "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300 border border-orange-200 dark:border-orange-800/50";
+      case "Approved":
+        return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800/50";
+      case "Rejected":
+        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 border border-red-200 dark:border-red-800/50";
+      case "Completed":
+        return "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600";
+      default:
+        return "bg-slate-100 text-slate-600";
+    }
+  };
+
+  const getStatusDotColor = (status: string) => {
+    switch (status) {
+      case "Pending":
+        return "bg-orange-500";
+      case "Approved":
+        return "bg-green-500";
+      case "Rejected":
+        return "bg-red-500";
+      case "Completed":
+        return "bg-slate-400";
+      default:
+        return "bg-slate-400";
+    }
+  };
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-display min-h-screen flex flex-col md:flex-row antialiased overflow-hidden">
       <aside className="w-full md:w-64 bg-white dark:bg-[#151f2b] border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 flex flex-col z-20 flex-shrink-0">
@@ -135,6 +231,11 @@ export const AdminDashboardPage: React.FC = () => {
           </div>
         </header>
         <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 space-y-6">
+          {error && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-red-600 dark:text-red-300">
+              {error}
+            </div>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex justify-between items-start">
@@ -143,11 +244,80 @@ export const AdminDashboardPage: React.FC = () => {
                     Occupancy Rate
                   </p>
                   <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    82%
+                    {loading ? "..." : `${stats.occupancyRate.toFixed(1)}%`}
                   </h3>
                 </div>
                 <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-primary">
                   <span className="material-icons-outlined text-xl">
+                    trending_up
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                Rooms in use
+              </p>
+            </div>
+            <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                    Pending Approvals
+                  </p>
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+                    {loading ? "..." : stats.pendingApprovals}
+                  </h3>
+                </div>
+                <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg text-orange-500">
+                  <span className="material-icons-outlined text-xl">
+                    hourglass_empty
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                Waiting for review
+              </p>
+            </div>
+            <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                    Completed Bookings
+                  </p>
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+                    {loading ? "..." : stats.completedBookings}
+                  </h3>
+                </div>
+                <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg text-green-500">
+                  <span className="material-icons-outlined text-xl">
+                    check_circle
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                Successfully completed
+              </p>
+            </div>
+            <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                    Rejection Rate
+                  </p>
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+                    {loading ? "..." : `${stats.rejectionRate.toFixed(1)}%`}
+                  </h3>
+                </div>
+                <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-500">
+                  <span className="material-icons-outlined text-xl">
+                    cancel
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                Denied requests
+              </p>
+            </div>
+          </div>
                     pie_chart
                   </span>
                 </div>
@@ -233,7 +403,7 @@ export const AdminDashboardPage: React.FC = () => {
             <div className="lg:col-span-2 bg-white dark:bg-[#151f2b] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
               <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
                 <h2 className="font-bold text-slate-900 dark:text-white">
-                  Pending Approvals
+                  Recent Approved Bookings
                 </h2>
                 <Link
                   className="text-sm font-medium text-primary hover:text-blue-600 transition-colors"
@@ -242,131 +412,87 @@ export const AdminDashboardPage: React.FC = () => {
                   View All
                 </Link>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider font-semibold">
-                    <tr>
-                      <th className="px-6 py-3">Requester</th>
-                      <th className="px-6 py-3">Room &amp; Details</th>
-                      <th className="px-6 py-3">Date</th>
-                      <th className="px-6 py-3 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <div className="h-8 w-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold mr-3">
-                            JD
-                          </div>
-                          <div>
+              {loading ? (
+                <div className="p-8 text-center">
+                  <div className="w-8 h-8 border-4 border-slate-200 dark:border-slate-700 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-slate-500 dark:text-slate-400">
+                    Loading bookings...
+                  </p>
+                </div>
+              ) : recentBookings.length === 0 ? (
+                <div className="p-8 text-center">
+                  <span className="material-icons text-slate-300 text-3xl block mb-2">
+                    event_busy
+                  </span>
+                  <p className="text-slate-500">No recent bookings</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider font-semibold">
+                      <tr>
+                        <th className="px-6 py-3">User</th>
+                        <th className="px-6 py-3">Room &amp; Purpose</th>
+                        <th className="px-6 py-3">Date & Time</th>
+                        <th className="px-6 py-3 text-right">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                      {recentBookings.map((booking) => (
+                        <tr
+                          key={booking.id}
+                          className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                        >
+                          <td className="px-6 py-4">
+                            <div className="flex items-center">
+                              <div className="h-8 w-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold mr-3">
+                                {booking.userId?.charAt(0).toUpperCase()}
+                              </div>
+                              <div>
+                                <div className="font-medium text-slate-900 dark:text-white">
+                                  User {booking.userId?.substring(0, 4)}
+                                </div>
+                                <div className="text-xs text-slate-500">
+                                  {booking.userId}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
                             <div className="font-medium text-slate-900 dark:text-white">
-                              John Doe
+                              {booking.roomName || "Room"}
                             </div>
                             <div className="text-xs text-slate-500">
-                              Faculty
+                              {booking.purpose || "-"}
                             </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-slate-900 dark:text-white">
-                          Lecture Hall A
-                        </div>
-                        <div className="text-xs text-slate-500">
-                          CS 101 Lecture
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                        Today, 2:00 PM
-                      </td>
-                      <td className="px-6 py-4 text-right space-x-2">
-                        <button
-                          className="inline-flex items-center justify-center h-8 w-8 rounded bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
-                          title="Reject"
-                        >
-                          <span className="material-icons-outlined text-lg">
-                            close
-                          </span>
-                        </button>
-                        <button
-                          className="inline-flex items-center justify-center h-8 w-8 rounded bg-primary text-white hover:bg-blue-600 shadow-sm transition-colors"
-                          title="Approve"
-                        >
-                          <span className="material-icons-outlined text-lg">
-                            check
-                          </span>
-                        </button>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <div className="h-8 w-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-bold mr-3">
-                            RC
-                          </div>
-                          <div>
-                            <div className="font-medium text-slate-900 dark:text-white">
-                              Robotics Club
-                            </div>
-                            <div className="text-xs text-slate-500">
-                              Student Org
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-slate-900 dark:text-white">
-                          Lab 304
-                        </div>
-                        <div className="text-xs text-slate-500">
-                          Project Build
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                        Oct 24, 5:00 PM
-                      </td>
-                      <td className="px-6 py-4 text-right space-x-2">
-                        <button
-                          className="inline-flex items-center justify-center h-8 w-8 rounded bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
-                          title="Reject"
-                        >
-                          <span className="material-icons-outlined text-lg">
-                            close
-                          </span>
-                        </button>
-                        <button
-                          className="inline-flex items-center justify-center h-8 w-8 rounded bg-primary text-white hover:bg-blue-600 shadow-sm transition-colors"
-                          title="Approve"
-                        >
-                          <span className="material-icons-outlined text-lg">
-                            check
-                          </span>
-                        </button>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <div className="h-8 w-8 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-xs font-bold mr-3">
-                            AS
-                          </div>
-                          <div>
-                            <div className="font-medium text-slate-900 dark:text-white">
-                              Sarah Smith
-                            </div>
-                            <div className="text-xs text-slate-500">
-                              Administration
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-slate-900 dark:text-white">
-                          Conf Room B
-                        </div>
-                        <div className="text-xs text-slate-500">
-                          Board Meeting
+                          </td>
+                          <td className="px-6 py-4 text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                            {new Date(booking.startTime).toLocaleDateString()},{" "}
+                            {new Date(booking.startTime).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                                booking.status
+                              )}`}
+                            >
+                              <span
+                                className={`w-1.5 h-1.5 rounded-full ${getStatusDotColor(
+                                  booking.status
+                                )} mr-1.5`}
+                              ></span>
+                              {booking.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-slate-600 dark:text-slate-400 whitespace-nowrap">
