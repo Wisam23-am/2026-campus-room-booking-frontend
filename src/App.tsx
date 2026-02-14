@@ -22,7 +22,6 @@ import { NotificationsPage } from "./pages/NotificationsPage";
 import { UserProfilePage } from "./pages/UserProfilePage";
 import { AdminUserManagementPage } from "./pages/AdminUserManagementPage";
 import { AdminSystemSettingsPage } from "./pages/AdminSystemSettingsPage";
-import { AdminRejectReasonModalPage } from "./pages/AdminRejectReasonModalPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { initializeDevMode } from "./utils/devMode";
 import "./App.css";
@@ -57,7 +56,7 @@ function App() {
           }
         />
         <Route
-          path="/bookings/create"
+          path="/booking/create"
           element={
             <ProtectedRoute>
               <CreateBookingPage />
@@ -141,14 +140,6 @@ function App() {
           element={
             <ProtectedRoute>
               <AdminSystemSettingsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/reject-modal"
-          element={
-            <ProtectedRoute>
-              <AdminRejectReasonModalPage />
             </ProtectedRoute>
           }
         />

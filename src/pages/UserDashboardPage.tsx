@@ -130,7 +130,7 @@ export const UserDashboardPage: React.FC = () => {
             </Link>
             <Link
               className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center shadow-lg shadow-primary/30 transition-all hover:-translate-y-0.5"
-              to="/bookings/create"
+              to="/booking/create"
             >
               <span className="material-icons text-lg mr-1.5">add</span>
               <span>New Booking</span>

@@ -40,7 +40,7 @@ export const RoomSchedulePage: React.FC = () => {
             <div className="flex items-center gap-4">
               <Link
                 className="bg-primary text-white px-4 py-2 rounded text-sm font-medium hover:bg-primary-dark transition-colors shadow-sm"
-                to="/bookings/create"
+                to="/booking/create"
               >
                 Create Booking
               </Link>

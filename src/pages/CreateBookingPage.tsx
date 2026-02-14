@@ -101,7 +101,7 @@ export const CreateBookingPage: React.FC = () => {
                 </Link>
                 <Link
                   className="border-primary text-neutral-900 dark:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                  to="/bookings/create"
+                  to="/booking/create"
                 >
                   New Booking
                 </Link>

@@ -208,7 +208,7 @@ export const BookingListPage: React.FC = () => {
           </div>
           <Link
             className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded shadow-sm text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
-            to="/bookings/create"
+            to="/booking/create"
           >
             <span className="material-icons text-sm mr-2">add</span>
             New Booking
