@@ -1,7 +1,81 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { bookingService } from "../services/booking.service";
+import { authService } from "../services/auth.service";
+import { RoomBooking } from "../types";
 
 export const UserDashboardPage: React.FC = () => {
+  const [bookings, setBookings] = useState<RoomBooking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [stats, setStats] = useState({
+    total: 0,
+    pending: 0,
+    upcoming: 0,
+    rejected: 0,
+  });
+  const currentUser = authService.getCurrentUser();
+
+  useEffect(() => {
+    fetchRecentBookings();
+  }, []);
+
+  const fetchRecentBookings = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await bookingService.getBookings({
+        take: 5,
+        userId: currentUser?.id,
+      });
+      const data = response.data || [];
+      setBookings(data);
+
+      // Calculate stats
+      const total = data.length;
+      const pending = data.filter((b) => b.status === "Pending").length;
+      const upcoming = data.filter((b) => new Date(b.startTime) > new Date())
+        .length;
+      const rejected = data.filter((b) => b.status === "Rejected").length;
+
+      setStats({ total, pending, upcoming, rejected });
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch bookings");
+      console.error("Error fetching bookings:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Pending":
+        return "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300 border border-orange-200 dark:border-orange-800/50";
+      case "Approved":
+        return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800/50";
+      case "Rejected":
+        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 border border-red-200 dark:border-red-800/50";
+      case "Completed":
+        return "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600";
+      default:
+        return "bg-slate-100 text-slate-600";
+    }
+  };
+
+  const getStatusDotColor = (status: string) => {
+    switch (status) {
+      case "Pending":
+        return "bg-orange-500";
+      case "Approved":
+        return "bg-green-500";
+      case "Rejected":
+        return "bg-red-500";
+      case "Completed":
+        return "bg-slate-400";
+      default:
+        return "bg-slate-400";
+    }
+  };
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-display transition-colors duration-200 antialiased h-screen flex overflow-hidden">
       <aside className="w-64 bg-white dark:bg-[#151f2e] border-r border-slate-200 dark:border-slate-800 hidden md:flex md:flex-col z-20 shadow-sm">
@@ -139,6 +213,11 @@ export const UserDashboardPage: React.FC = () => {
         </header>
         <main className="flex-1 overflow-y-auto p-6 lg:p-8 scroll-smooth">
           <div className="max-w-7xl mx-auto space-y-8">
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-red-600 dark:text-red-300">
+                {error}
+              </div>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="bg-white dark:bg-[#151f2e] rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between mb-4">
@@ -147,15 +226,12 @@ export const UserDashboardPage: React.FC = () => {
                       analytics
                     </span>
                   </div>
-                  <span className="flex items-center text-xs font-medium text-green-600 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded">
-                    +2 this week
-                  </span>
                 </div>
                 <h3 className="text-slate-500 dark:text-slate-400 text-sm font-medium">
                   Total Bookings
                 </h3>
                 <p className="text-2xl font-bold text-slate-800 dark:text-white mt-1">
-                  12
+                  {loading ? "..." : stats.total}
                 </p>
               </div>
               <div className="bg-white dark:bg-[#151f2e] rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
@@ -170,7 +246,7 @@ export const UserDashboardPage: React.FC = () => {
                   Pending Approval
                 </h3>
                 <p className="text-2xl font-bold text-slate-800 dark:text-white mt-1">
-                  2
+                  {loading ? "..." : stats.pending}
                 </p>
               </div>
               <div className="bg-white dark:bg-[#151f2e] rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
@@ -181,13 +257,12 @@ export const UserDashboardPage: React.FC = () => {
                       event_available
                     </span>
                   </div>
-                  <span className="text-xs text-slate-400">Next: Tomorrow</span>
                 </div>
                 <h3 className="text-slate-500 dark:text-slate-400 text-sm font-medium relative z-10">
                   Upcoming
                 </h3>
                 <p className="text-2xl font-bold text-slate-800 dark:text-white mt-1 relative z-10">
-                  1
+                  {loading ? "..." : stats.upcoming}
                 </p>
               </div>
               <div className="bg-white dark:bg-[#151f2e] rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
@@ -200,7 +275,7 @@ export const UserDashboardPage: React.FC = () => {
                   Rejected
                 </h3>
                 <p className="text-2xl font-bold text-slate-800 dark:text-white mt-1">
-                  0
+                  {loading ? "..." : stats.rejected}
                 </p>
               </div>
             </div>
@@ -220,179 +295,120 @@ export const UserDashboardPage: React.FC = () => {
                     </span>
                   </Link>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800/50">
-                        <th className="py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                          Room Info
-                        </th>
-                        <th className="py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                          Date &amp; Time
-                        </th>
-                        <th className="py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                          Purpose
-                        </th>
-                        <th className="py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">
-                          Status
-                        </th>
-                        <th className="py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-center">
-                          Action
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-                      <tr className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
-                        <td className="py-4 px-6">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center shrink-0">
-                              <span className="material-icons text-indigo-500 text-lg">
-                                meeting_room
-                              </span>
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
-                                Study Room A
-                              </p>
-                              <p className="text-xs text-slate-500">
-                                Library 2nd Fl
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <p className="text-sm text-slate-700 dark:text-slate-300">
-                            Oct 26, 2023
-                          </p>
-                          <p className="text-xs text-slate-500">
-                            2:00 PM - 4:00 PM
-                          </p>
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className="text-sm text-slate-600 dark:text-slate-400">
-                            Group Study
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-right">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300 border border-orange-200 dark:border-orange-800/50">
-                            <span className="w-1.5 h-1.5 rounded-full bg-orange-500 mr-1.5"></span>
-                            Pending
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-center">
-                          <button className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <span className="material-icons text-xl">
-                              more_vert
-                            </span>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
-                        <td className="py-4 px-6">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-                              <span className="material-icons text-emerald-500 text-lg">
-                                videocam
-                              </span>
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
-                                Conf Room B
-                              </p>
-                              <p className="text-xs text-slate-500">
-                                Building C
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <p className="text-sm text-slate-700 dark:text-slate-300">
-                            Oct 24, 2023
-                          </p>
-                          <p className="text-xs text-slate-500">
-                            10:00 AM - 12:00 PM
-                          </p>
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className="text-sm text-slate-600 dark:text-slate-400">
-                            Project Demo
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-right">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800/50">
-                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>
-                            Approved
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-center">
-                          <button className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <span className="material-icons text-xl">
-                              more_vert
-                            </span>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
-                        <td className="py-4 px-6">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
-                              <span className="material-icons text-purple-500 text-lg">
-                                podcasts
-                              </span>
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
-                                Media Lab 1
-                              </p>
-                              <p className="text-xs text-slate-500">
-                                Arts Center
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <p className="text-sm text-slate-700 dark:text-slate-300">
-                            Oct 20, 2023
-                          </p>
-                          <p className="text-xs text-slate-500">
-                            4:00 PM - 5:00 PM
-                          </p>
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className="text-sm text-slate-600 dark:text-slate-400">
-                            Recording
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-right">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600">
-                            <span className="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5"></span>
-                            Completed
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-center">
-                          <button className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <span className="material-icons text-xl">
-                              more_vert
-                            </span>
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="hidden p-8 text-center">
-                  <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="material-icons text-slate-300 text-3xl">
-                      event_busy
-                    </span>
+                {loading ? (
+                  <div className="p-8 text-center">
+                    <div className="w-8 h-8 border-4 border-slate-200 dark:border-slate-700 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-slate-500 dark:text-slate-400">
+                      Loading bookings...
+                    </p>
                   </div>
-                  <h3 className="text-slate-800 dark:text-white font-medium">
-                    No bookings found
-                  </h3>
-                  <p className="text-slate-500 text-sm mt-1">
-                    Get started by creating your first room reservation.
-                  </p>
-                </div>
+                ) : bookings.length === 0 ? (
+                  <div className="p-8 text-center">
+                    <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="material-icons text-slate-300 text-3xl">
+                        event_busy
+                      </span>
+                    </div>
+                    <h3 className="text-slate-800 dark:text-white font-medium">
+                      No bookings found
+                    </h3>
+                    <p className="text-slate-500 text-sm mt-1">
+                      Get started by creating your first room reservation.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800/50">
+                          <th className="py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            Room Info
+                          </th>
+                          <th className="py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            Date &amp; Time
+                          </th>
+                          <th className="py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            Purpose
+                          </th>
+                          <th className="py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">
+                            Status
+                          </th>
+                          <th className="py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-center">
+                            Action
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+                        {bookings.map((booking) => (
+                          <tr
+                            key={booking.id}
+                            className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group"
+                          >
+                            <td className="py-4 px-6">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center shrink-0">
+                                  <span className="material-icons text-indigo-500 text-lg">
+                                    meeting_room
+                                  </span>
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                                    {booking.roomName || "Room"}
+                                  </p>
+                                  <p className="text-xs text-slate-500">
+                                    {booking.roomId}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-4 px-6">
+                              <p className="text-sm text-slate-700 dark:text-slate-300">
+                                {new Date(booking.startTime).toLocaleDateString()}
+                              </p>
+                              <p className="text-xs text-slate-500">
+                                {new Date(
+                                  booking.startTime
+                                ).toLocaleTimeString()}{" "}
+                                -{" "}
+                                {new Date(booking.endTime).toLocaleTimeString()}
+                              </p>
+                            </td>
+                            <td className="py-4 px-6">
+                              <span className="text-sm text-slate-600 dark:text-slate-400">
+                                {booking.purpose || "-"}
+                              </span>
+                            </td>
+                            <td className="py-4 px-6 text-right">
+                              <span
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                                  booking.status
+                                )}`}
+                              >
+                                <span
+                                  className={`w-1.5 h-1.5 rounded-full ${getStatusDotColor(
+                                    booking.status
+                                  )} mr-1.5`}
+                                ></span>
+                                {booking.status}
+                              </span>
+                            </td>
+                            <td className="py-4 px-6 text-center">
+                              <Link
+                                to={`/bookings/${booking.id}`}
+                                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <span className="material-icons text-xl">
+                                  more_vert
+                                </span>
+                              </Link>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  </div>
+                )}
               </div>
               <div className="space-y-6">
                 <div className="bg-gradient-to-br from-primary to-primary-dark rounded-xl p-6 text-white shadow-lg shadow-primary/20 relative overflow-hidden">
