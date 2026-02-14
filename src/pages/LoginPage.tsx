@@ -1,7 +1,41 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { authService } from "../services/auth.service";
 
 export const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState(() => {
+    return localStorage.getItem("remember_email") || "";
+  });
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [rememberMe, setRememberMe] = useState(
+    !!localStorage.getItem("remember_email"),
+  );
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      await authService.login(email, password);
+
+      if (rememberMe) {
+        localStorage.setItem("remember_email", email);
+      }
+
+      // Redirect to bookings page
+      navigate("/bookings");
+    } catch (err: any) {
+      setError(err.message || "Login gagal. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="bg-background-light dark:bg-background-dark min-h-screen flex flex-col items-center justify-center font-display antialiased text-slate-800 dark:text-slate-100 transition-colors duration-300 relative">
       <div className="w-full max-w-6xl px-4 md:px-6 flex flex-col md:flex-row items-center justify-center gap-12 lg:gap-20">
@@ -79,7 +113,14 @@ export const LoginPage: React.FC = () => {
                 Silakan masukkan detail Anda untuk masuk.
               </p>
             </div>
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              {error && (
+                <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                  <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                    {error}
+                  </p>
+                </div>
+              )}
               <div className="space-y-2">
                 <label
                   className="block text-sm font-medium text-slate-700 dark:text-slate-300"
@@ -98,6 +139,9 @@ export const LoginPage: React.FC = () => {
                     placeholder="nama@universitas.ac.id"
                     required
                     type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -118,14 +162,19 @@ export const LoginPage: React.FC = () => {
                     name="password"
                     placeholder="********"
                     required
-                    type="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
                   />
                   <button
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer focus:outline-none"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer focus:outline-none transition-colors"
                     type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={loading}
                   >
                     <span className="material-icons text-xl">
-                      visibility_off
+                      {showPassword ? "visibility" : "visibility_off"}
                     </span>
                   </button>
                 </div>
@@ -137,6 +186,9 @@ export const LoginPage: React.FC = () => {
                     id="remember-me"
                     name="remember-me"
                     type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    disabled={loading}
                   />
                   <label
                     className="ml-2 block text-sm text-slate-600 dark:text-slate-400 select-none cursor-pointer"
@@ -155,13 +207,25 @@ export const LoginPage: React.FC = () => {
                 </div>
               </div>
               <button
-                className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-slate-800 transition-all transform active:scale-[0.99]"
+                className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-slate-800 transition-all transform active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
                 type="submit"
+                disabled={loading}
               >
-                Masuk
-                <span className="material-icons text-sm ml-2">
-                  arrow_forward
-                </span>
+                {loading ? (
+                  <>
+                    <span className="material-icons text-sm mr-2 animate-spin">
+                      refresh
+                    </span>
+                    Memproses...
+                  </>
+                ) : (
+                  <>
+                    Masuk
+                    <span className="material-icons text-sm ml-2">
+                      arrow_forward
+                    </span>
+                  </>
+                )}
               </button>
             </form>
             <div className="mt-8 mb-6 relative">
