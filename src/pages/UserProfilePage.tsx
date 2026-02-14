@@ -1,7 +1,89 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { userService } from "../services/user.service";
+import { authService } from "../services/auth.service";
+import { User } from "../types";
 
 export const UserProfilePage: React.FC = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const currentUser = authService.getCurrentUser();
+        if (currentUser?.id) {
+          const data = await userService.getUserById(currentUser.id);
+          setUser(data);
+          setFormData(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch user profile:", err);
+        setError("Gagal memuat profil pengguna");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (formData) {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  const handleSave = async () => {
+    if (!formData || !user) return;
+    try {
+      setSaving(true);
+      setError(null);
+      await userService.updateUser(user.id, formData);
+      setUser(formData);
+      localStorage.setItem("current_user", JSON.stringify(formData));
+      setIsEditing(false);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      console.error("Failed to update profile:", err);
+      setError("Gagal memperbarui profil");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setFormData(user);
+    setIsEditing(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center">
+        <div className="text-slate-600 dark:text-slate-400">Memuat profil...</div>
+      </div>
+    );
+  }
+
+  if (!user || !formData) {
+    return (
+      <div className="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center">
+        <div className="text-slate-600 dark:text-slate-400">Profil tidak ditemukan</div>
+      </div>
+    );
+  }
+
+  const roleDisplay = user.role === 1 ? "Admin" : "Pengguna";
+
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-800 dark:text-white min-h-screen flex overflow-hidden">
       <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex-shrink-0 hidden md:flex flex-col h-screen fixed z-20">
@@ -115,6 +197,16 @@ export const UserProfilePage: React.FC = () => {
 
         <div className="flex-1 overflow-y-auto p-6 md:p-8">
           <div className="max-w-4xl mx-auto space-y-6">
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg">
+                {error}
+              </div>
+            )}
+            {success && (
+              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900/50 text-green-700 dark:text-green-400 px-4 py-3 rounded-lg">
+                Profil berhasil diperbarui
+              </div>
+            )}
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden relative">
               <div className="h-32 bg-gradient-to-r from-primary/10 via-blue-500/5 to-primary/20 dark:from-primary/20 dark:to-blue-900/20 relative">
                 <div className="absolute inset-0 opacity-10 pattern-grid-lg text-primary"></div>
@@ -142,29 +234,57 @@ export const UserProfilePage: React.FC = () => {
                   </div>
 
                   <div className="flex-1 pt-2 md:pt-0">
-                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-1">
-                      <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
-                        Budi Santoso
-                      </h2>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20 self-start md:self-auto">
-                        Mahasiswa Aktif
-                      </span>
-                    </div>
-                    <p className="text-slate-500 dark:text-slate-400 flex items-center gap-1 text-sm md:text-base">
-                      <span className="material-icons-outlined text-sm">
-                        school
-                      </span>
-                      Teknik Informatika - Angkatan 2021
-                    </p>
+                  <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-1">
+                    <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
+                      {user.fullName}
+                    </h2>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20 self-start md:self-auto">
+                      {roleDisplay}
+                    </span>
+                  </div>
+                  <p className="text-slate-500 dark:text-slate-400 flex items-center gap-1 text-sm md:text-base">
+                    <span className="material-icons-outlined text-sm">
+                      school
+                    </span>
+                    Pengguna
+                  </p>
                   </div>
 
                   <div className="hidden md:block pb-1">
-                    <button className="bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium text-sm">
-                      <span className="material-icons-outlined text-lg">
-                        edit
-                      </span>
-                      Edit Profil
-                    </button>
+                    {!isEditing ? (
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium text-sm"
+                      >
+                        <span className="material-icons-outlined text-lg">
+                          edit
+                        </span>
+                        Edit Profil
+                      </button>
+                    ) : (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleSave}
+                          disabled={saving}
+                          className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-5 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium text-sm"
+                        >
+                          <span className="material-icons-outlined text-lg">
+                            check
+                          </span>
+                          Simpan
+                        </button>
+                        <button
+                          onClick={handleCancel}
+                          disabled={saving}
+                          className="bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 disabled:opacity-50 text-slate-700 dark:text-slate-300 px-5 py-2.5 rounded-lg shadow-sm hover:shadow transition-all flex items-center gap-2 font-medium text-sm"
+                        >
+                          <span className="material-icons-outlined text-lg">
+                            close
+                          </span>
+                          Batal
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -183,46 +303,50 @@ export const UserProfilePage: React.FC = () => {
                       <label className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
                         Nama Lengkap
                       </label>
-                      <div className="text-slate-900 dark:text-white font-medium">
-                        Budi Santoso
-                      </div>
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          name="fullName"
+                          value={formData.fullName}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent"
+                        />
+                      ) : (
+                        <div className="text-slate-900 dark:text-white font-medium">
+                          {user.fullName}
+                        </div>
+                      )}
                     </div>
                     <div className="space-y-1">
                       <label className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
                         Email Universitas
                       </label>
-                      <div className="text-slate-900 dark:text-white font-medium flex items-center gap-2">
-                        budi.s@student.univ.ac.id
-                        <span
-                          className="material-icons text-green-500 text-sm"
-                          title="Verified"
-                        >
-                          verified
-                        </span>
-                      </div>
+                      {isEditing ? (
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent"
+                        />
+                      ) : (
+                        <div className="text-slate-900 dark:text-white font-medium flex items-center gap-2">
+                          {user.email}
+                          <span
+                            className="material-icons text-green-500 text-sm"
+                            title="Verified"
+                          >
+                            verified
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div className="space-y-1">
                       <label className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                        NIM / NIP
-                      </label>
-                      <div className="text-slate-900 dark:text-white font-medium font-mono">
-                        12345678
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                        Nomor Telepon
-                      </label>
-                      <div className="text-slate-900 dark:text-white font-medium">
-                        +62 812 3456 7890
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                        Departemen
+                        Diproduksi
                       </label>
                       <div className="text-slate-900 dark:text-white font-medium">
-                        Ilmu Komputer
+                        {new Date(user.createdAt).toLocaleDateString('id-ID')}
                       </div>
                     </div>
                     <div className="space-y-1">
@@ -230,19 +354,47 @@ export const UserProfilePage: React.FC = () => {
                         Peran
                       </label>
                       <div className="text-slate-900 dark:text-white font-medium">
-                        Mahasiswa
+                        {roleDisplay}
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div className="md:hidden">
-                  <button className="w-full bg-primary hover:bg-primary-dark text-white px-4 py-3 rounded-lg shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 font-medium">
-                    <span className="material-icons-outlined text-lg">
-                      edit
-                    </span>
-                    Edit Profil
-                  </button>
+                  {!isEditing ? (
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="w-full bg-primary hover:bg-primary-dark text-white px-4 py-3 rounded-lg shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 font-medium"
+                    >
+                      <span className="material-icons-outlined text-lg">
+                        edit
+                      </span>
+                      Edit Profil
+                    </button>
+                  ) : (
+                    <div className="space-y-2">
+                      <button
+                        onClick={handleSave}
+                        disabled={saving}
+                        className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-4 py-3 rounded-lg shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 font-medium"
+                      >
+                        <span className="material-icons-outlined text-lg">
+                          check
+                        </span>
+                        Simpan
+                      </button>
+                      <button
+                        onClick={handleCancel}
+                        disabled={saving}
+                        className="w-full bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 disabled:opacity-50 text-slate-700 dark:text-slate-300 px-4 py-3 rounded-lg shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 font-medium"
+                      >
+                        <span className="material-icons-outlined text-lg">
+                          close
+                        </span>
+                        Batal
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 
