@@ -28,7 +28,7 @@ export const NotificationsPage: React.FC = () => {
                 </Link>
                 <Link
                   className="border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                  to="/rooms/schedule"
+                  to="/rooms"
                 >
                   Ruangan
                 </Link>
@@ -136,7 +136,7 @@ export const NotificationsPage: React.FC = () => {
                 <div className="mt-2 flex gap-2">
                   <Link
                     className="text-xs font-medium text-primary hover:text-primary-dark transition-colors"
-                    to="/bookings/details"
+                    to="/bookings"
                   >
                     Lihat Detail
                   </Link>

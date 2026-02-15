@@ -23,6 +23,10 @@ import { UserProfilePage } from "./pages/UserProfilePage";
 import { AdminUserManagementPage } from "./pages/AdminUserManagementPage";
 import { AdminSystemSettingsPage } from "./pages/AdminSystemSettingsPage";
 import { AdminRejectReasonModalPage } from "./pages/AdminRejectReasonModalPage";
+import { RoomsListPage } from "./pages/RoomsListPage";
+import { ProfileSecurityPage } from "./pages/ProfileSecurityPage";
+import { VerifyEmailPage } from "./pages/VerifyEmailPage";
+import { AdminLogsPage } from "./pages/AdminLogsPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { initializeDevMode } from "./utils/devMode";
 import "./App.css";
@@ -38,6 +42,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
 
         {/* Protected Routes */}
         <Route
@@ -57,10 +62,34 @@ function App() {
           }
         />
         <Route
-          path="/bookings/create"
+          path="/booking/create"
           element={
             <ProtectedRoute>
               <CreateBookingPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/bookings/create"
+          element={
+            <ProtectedRoute>
+              <Navigate to="/booking/create" replace />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/booking/edit/:id"
+          element={
+            <ProtectedRoute>
+              <CreateBookingPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/booking/:id"
+          element={
+            <ProtectedRoute>
+              <BookingDetailsPage />
             </ProtectedRoute>
           }
         />
@@ -69,6 +98,14 @@ function App() {
           element={
             <ProtectedRoute>
               <BookingDetailsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/rooms"
+          element={
+            <ProtectedRoute>
+              <RoomsListPage />
             </ProtectedRoute>
           }
         />
@@ -97,6 +134,22 @@ function App() {
           }
         />
         <Route
+          path="/profile/edit"
+          element={
+            <ProtectedRoute>
+              <UserProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile/security"
+          element={
+            <ProtectedRoute>
+              <ProfileSecurityPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/admin/dashboard"
           element={
             <ProtectedRoute>
@@ -121,6 +174,14 @@ function App() {
           }
         />
         <Route
+          path="/admin/rooms/create"
+          element={
+            <ProtectedRoute>
+              <AdminRoomsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/admin/reports"
           element={
             <ProtectedRoute>
@@ -133,6 +194,30 @@ function App() {
           element={
             <ProtectedRoute>
               <AdminUserManagementPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/users/:id"
+          element={
+            <ProtectedRoute>
+              <AdminUserManagementPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/logs"
+          element={
+            <ProtectedRoute>
+              <AdminLogsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/logs/export"
+          element={
+            <ProtectedRoute>
+              <AdminLogsPage />
             </ProtectedRoute>
           }
         />

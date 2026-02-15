@@ -61,10 +61,10 @@ export const CreateBookingPage: React.FC = () => {
         endTime: formData.endTime,
       };
 
-      const result = await bookingService.createBooking(formattedData);
+      await bookingService.createBooking(formattedData);
 
       // Success: redirect to booking list or detail
-      navigate(`/bookings/${result.id}`, {
+      navigate(`/bookings`, {
         state: { message: "Booking created successfully!" },
       });
     } catch (err: any) {
@@ -101,7 +101,7 @@ export const CreateBookingPage: React.FC = () => {
                 </Link>
                 <Link
                   className="border-primary text-neutral-900 dark:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                  to="/bookings/create"
+                  to="/booking/create"
                 >
                   New Booking
                 </Link>
@@ -327,7 +327,7 @@ export const CreateBookingPage: React.FC = () => {
                   <button
                     className="bg-white dark:bg-transparent py-2.5 px-6 border border-neutral-300 dark:border-neutral-600 rounded-lg shadow-sm text-sm font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
                     type="button"
-                    onClick={() => navigate("/bookings")}
+                    onClick={() => navigate("/dashboard")}
                     disabled={loading}
                   >
                     Cancel

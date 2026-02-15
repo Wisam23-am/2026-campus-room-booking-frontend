@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { bookingService } from "../services/booking.service";
-import { authService } from "../services/auth.service";
 import { RoomBooking } from "../types";
 
 export const UserDashboardPage: React.FC = () => {
@@ -14,7 +13,6 @@ export const UserDashboardPage: React.FC = () => {
     upcoming: 0,
     rejected: 0,
   });
-  const currentUser = authService.getCurrentUser();
 
   useEffect(() => {
     fetchRecentBookings();
@@ -25,18 +23,18 @@ export const UserDashboardPage: React.FC = () => {
       setLoading(true);
       setError(null);
       const response = await bookingService.getBookings({
-        take: 5,
-        userId: currentUser?.id,
+        pageSize: 5,
       });
       const data = response.data || [];
       setBookings(data);
 
       // Calculate stats
       const total = data.length;
-      const pending = data.filter((b) => b.status === "Pending").length;
-      const upcoming = data.filter((b) => new Date(b.startTime) > new Date())
-        .length;
-      const rejected = data.filter((b) => b.status === "Rejected").length;
+      const pending = data.filter((b) => b.status === 0).length;
+      const upcoming = data.filter(
+        (b) => new Date(b.startTime) > new Date(),
+      ).length;
+      const rejected = data.filter((b) => b.status === 2).length;
 
       setStats({ total, pending, upcoming, rejected });
     } catch (err: any) {
@@ -47,33 +45,42 @@ export const UserDashboardPage: React.FC = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: 0 | 1 | 2) => {
     switch (status) {
-      case "Pending":
+      case 0:
         return "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300 border border-orange-200 dark:border-orange-800/50";
-      case "Approved":
+      case 1:
         return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800/50";
-      case "Rejected":
+      case 2:
         return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 border border-red-200 dark:border-red-800/50";
-      case "Completed":
-        return "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600";
       default:
         return "bg-slate-100 text-slate-600";
     }
   };
 
-  const getStatusDotColor = (status: string) => {
+  const getStatusDotColor = (status: 0 | 1 | 2) => {
     switch (status) {
-      case "Pending":
+      case 0:
         return "bg-orange-500";
-      case "Approved":
+      case 1:
         return "bg-green-500";
-      case "Rejected":
+      case 2:
         return "bg-red-500";
-      case "Completed":
-        return "bg-slate-400";
       default:
         return "bg-slate-400";
+    }
+  };
+
+  const getStatusLabel = (status: 0 | 1 | 2) => {
+    switch (status) {
+      case 0:
+        return "Pending";
+      case 1:
+        return "Approved";
+      case 2:
+        return "Rejected";
+      default:
+        return "Unknown";
     }
   };
   return (
@@ -109,7 +116,7 @@ export const UserDashboardPage: React.FC = () => {
           </Link>
           <Link
             className="flex items-center px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-primary dark:hover:text-primary rounded-lg group transition-colors"
-            to="/rooms/schedule"
+            to="/rooms"
           >
             <span className="material-icons mr-3 text-xl group-hover:text-primary transition-colors">
               search
@@ -150,7 +157,7 @@ export const UserDashboardPage: React.FC = () => {
         <div className="p-4 border-t border-slate-100 dark:border-slate-800/50">
           <div className="flex items-center gap-3">
             <img
-              alt="User Profile Picture"
+              alt="User profile"
               className="w-9 h-9 rounded-full object-cover ring-2 ring-primary/20"
               data-alt="Portrait of a male student"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUp6CwKtBq3cvASTt22vHmO3rQtwuPw-NeSmtGVRCyMqInP-WkS4HUd71rv7RvRE0JQS7rMWO6sVKKSt8snOGQ315QWY3kEI7YfBDA9eg3fl1szasHzCcAAqKEsEkJsrkdZfOQc2Ot8Zi2pCKz_qdA5qiVzhlrL6bJZpKrpxko7yUtRnP0_H6xOYLXUAIEOzgAen5Manj63Qs9qiy-hnxbtVhmLKK-7X3lAfhz4Po3FO22MF8yRdICigOE5BLT0B3Xm227gc8YeXQ"
@@ -204,7 +211,7 @@ export const UserDashboardPage: React.FC = () => {
             </Link>
             <Link
               className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center shadow-lg shadow-primary/30 transition-all hover:-translate-y-0.5"
-              to="/bookings/create"
+              to="/booking/create"
             >
               <span className="material-icons text-lg mr-1.5">add</span>
               <span>New Booking</span>
@@ -356,18 +363,20 @@ export const UserDashboardPage: React.FC = () => {
                                     {booking.roomName || "Room"}
                                   </p>
                                   <p className="text-xs text-slate-500">
-                                    {booking.roomId}
+                                    Booking #{booking.id}
                                   </p>
                                 </div>
                               </div>
                             </td>
                             <td className="py-4 px-6">
                               <p className="text-sm text-slate-700 dark:text-slate-300">
-                                {new Date(booking.startTime).toLocaleDateString()}
+                                {new Date(
+                                  booking.startTime,
+                                ).toLocaleDateString()}
                               </p>
                               <p className="text-xs text-slate-500">
                                 {new Date(
-                                  booking.startTime
+                                  booking.startTime,
                                 ).toLocaleTimeString()}{" "}
                                 -{" "}
                                 {new Date(booking.endTime).toLocaleTimeString()}
@@ -381,15 +390,15 @@ export const UserDashboardPage: React.FC = () => {
                             <td className="py-4 px-6 text-right">
                               <span
                                 className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                                  booking.status
+                                  booking.status,
                                 )}`}
                               >
                                 <span
                                   className={`w-1.5 h-1.5 rounded-full ${getStatusDotColor(
-                                    booking.status
+                                    booking.status,
                                   )} mr-1.5`}
                                 ></span>
-                                {booking.status}
+                                {getStatusLabel(booking.status)}
                               </span>
                             </td>
                             <td className="py-4 px-6 text-center">
@@ -406,7 +415,6 @@ export const UserDashboardPage: React.FC = () => {
                         ))}
                       </tbody>
                     </table>
-                  </div>
                   </div>
                 )}
               </div>

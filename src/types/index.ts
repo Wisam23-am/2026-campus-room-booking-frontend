@@ -45,10 +45,12 @@ export interface PaginatedResponse<T> {
 }
 
 export interface User {
-  id: string;
-  name: string;
+  id: number;
+  fullName: string;
   email: string;
-  role: 'user' | 'admin';
+  role: 0 | 1;
+  createdAt: string;
+  updatedAt?: string;
   token?: string;
 }
 
