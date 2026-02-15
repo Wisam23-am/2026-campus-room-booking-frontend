@@ -1,12 +1,29 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { authService } from "../services/auth.service";
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    navigate("/verify-email");
+    setError("");
+    setLoading(true);
+
+    try {
+      await authService.register(fullName, email, password);
+      navigate("/login");
+    } catch (err: any) {
+      setError(err.message || "Register gagal. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -72,6 +89,13 @@ export const RegisterPage: React.FC = () => {
               </p>
             </div>
             <form action="#" className="space-y-6" onSubmit={handleSubmit}>
+              {error && (
+                <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                  <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                    {error}
+                  </p>
+                </div>
+              )}
               <div>
                 <label
                   className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5"
@@ -86,49 +110,32 @@ export const RegisterPage: React.FC = () => {
                     name="fullname"
                     placeholder="Contoh: Budi Santoso"
                     type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                    disabled={loading}
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label
-                    className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5"
-                    htmlFor="email"
-                  >
-                    Email Kampus
-                  </label>
-                  <input
-                    className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:border-primary focus:ring-primary shadow-sm py-3 transition-colors duration-200"
-                    id="email"
-                    name="email"
-                    placeholder="nama@univ.ac.id"
-                    type="email"
-                  />
-                </div>
-                <div>
-                  <label
-                    className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5"
-                    htmlFor="identity"
-                  >
-                    NIM / NIP
-                  </label>
-                  <div className="relative">
-                    <input
-                      className="invalid-input w-full rounded-lg border-red-500 dark:border-red-500 bg-red-50 dark:bg-red-900/10 text-gray-900 dark:text-white placeholder-gray-400 focus:border-red-500 focus:ring-red-500 shadow-sm py-3 transition-colors duration-200"
-                      id="identity"
-                      name="identity"
-                      placeholder="12345678"
-                      type="text"
-                    />
-                    <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                      <span className="material-icons-round text-[14px]">
-                        error_outline
-                      </span>
-                      NIM harus terdiri dari 8 digit angka.
-                    </p>
-                  </div>
-                </div>
+              <div>
+                <label
+                  className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5"
+                  htmlFor="email"
+                >
+                  Email
+                </label>
+                <input
+                  className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:border-primary focus:ring-primary shadow-sm py-3 transition-colors duration-200"
+                  id="email"
+                  name="email"
+                  placeholder="nama@email.com"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading}
+                />
               </div>
 
               <div>
@@ -173,6 +180,10 @@ export const RegisterPage: React.FC = () => {
                     name="password"
                     placeholder="Minimal 8 karakter"
                     type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={loading}
                   />
                   <button
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary transition-colors focus:outline-none"
@@ -221,8 +232,9 @@ export const RegisterPage: React.FC = () => {
               <button
                 className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-lg shadow-lg shadow-blue-500/30 text-sm font-semibold text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 transform hover:-translate-y-0.5"
                 type="submit"
+                disabled={loading}
               >
-                Daftar Sekarang
+                {loading ? "Memproses..." : "Daftar Sekarang"}
               </button>
 
               <div className="relative my-6">

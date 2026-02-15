@@ -245,6 +245,7 @@ export const LoginPage: React.FC = () => {
               <button
                 className="w-full flex justify-center items-center gap-3 px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm bg-white dark:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-slate-800 transition-colors"
                 type="button"
+                onClick={() => navigate("/register")}
               >
                 <svg
                   className="h-5 w-5"
@@ -259,7 +260,7 @@ export const LoginPage: React.FC = () => {
                   ></path>
                   <path d="M12 2V12H2" fill="currentColor"></path>
                 </svg>
-                Single Sign-On Universitas
+                Register
               </button>
             </div>
             <div className="mt-8 text-center">
