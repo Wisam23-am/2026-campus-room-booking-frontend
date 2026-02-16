@@ -38,7 +38,7 @@ export const RoomSchedulePage: React.FC = () => {
           roomService.getRoomSchedule(
             roomId,
             dateFrom ? new Date(dateFrom).toISOString() : undefined,
-            dateTo ? new Date(dateTo).toISOString() : undefined
+            dateTo ? new Date(dateTo).toISOString() : undefined,
           ),
         ]);
 
@@ -183,7 +183,10 @@ export const RoomSchedulePage: React.FC = () => {
             <li>
               <span className="text-neutral-300 mx-2">/</span>
             </li>
-            <li aria-current="page" className="text-primary font-medium text-sm">
+            <li
+              aria-current="page"
+              className="text-primary font-medium text-sm"
+            >
               Schedule
             </li>
           </ol>
@@ -213,7 +216,10 @@ export const RoomSchedulePage: React.FC = () => {
 
         {/* Date Range Filter */}
         <div className="bg-white dark:bg-[#1e293b] shadow-sm rounded-xl p-6 mb-6 border border-neutral-200 dark:border-neutral-700">
-          <form onSubmit={handleDateRangeSubmit} className="flex items-end gap-4">
+          <form
+            onSubmit={handleDateRangeSubmit}
+            className="flex items-end gap-4"
+          >
             <div className="flex-1">
               <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                 From Date
@@ -291,7 +297,7 @@ export const RoomSchedulePage: React.FC = () => {
                         </h4>
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(
-                            booking.status
+                            booking.status,
                           )}`}
                         >
                           {getStatusLabel(booking.status)}

@@ -30,7 +30,10 @@ export const CreateBookingPage: React.FC = () => {
     }
   }, [searchParams]);
 
-  const handleRoomSelect = (selectedRoomId: number | null, selectedRoomName: string) => {
+  const handleRoomSelect = (
+    selectedRoomId: number | null,
+    selectedRoomName: string,
+  ) => {
     setRoomId(selectedRoomId);
     setFormData((prev) => ({
       ...prev,

@@ -149,7 +149,9 @@ export const RoomsListPage: React.FC = () => {
         {error && (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
             <div className="flex items-center gap-2">
-              <span className="material-icons text-red-600 dark:text-red-400">error</span>
+              <span className="material-icons text-red-600 dark:text-red-400">
+                error
+              </span>
               <p className="text-red-800 dark:text-red-200">{error}</p>
             </div>
           </div>
@@ -167,11 +169,15 @@ export const RoomsListPage: React.FC = () => {
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent mx-auto mb-2"></div>
-            <p className="text-slate-600 dark:text-slate-400 text-sm">Loading...</p>
+            <p className="text-slate-600 dark:text-slate-400 text-sm">
+              Loading...
+            </p>
           </div>
         ) : rooms.length === 0 ? (
           <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-xl">
-            <span className="material-icons text-slate-400 text-6xl mb-4">search_off</span>
+            <span className="material-icons text-slate-400 text-6xl mb-4">
+              search_off
+            </span>
             <p className="text-slate-600 dark:text-slate-400">No rooms found</p>
             <p className="text-slate-500 dark:text-slate-500 text-sm mt-2">
               Try adjusting your search criteria
@@ -211,7 +217,9 @@ export const RoomsListPage: React.FC = () => {
                     </div>
                     {room.category && (
                       <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                        <span className="material-icons text-base">category</span>
+                        <span className="material-icons text-base">
+                          category
+                        </span>
                         <span>{room.category}</span>
                       </div>
                     )}

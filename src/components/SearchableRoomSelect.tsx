@@ -62,7 +62,7 @@ export const SearchableRoomSelect: React.FC<SearchableRoomSelectProps> = ({
       (room) =>
         room.name.toLowerCase().includes(search) ||
         room.building.toLowerCase().includes(search) ||
-        (room.category && room.category.toLowerCase().includes(search))
+        (room.category && room.category.toLowerCase().includes(search)),
     );
     setFilteredRooms(filtered);
   }, [searchTerm, rooms]);
@@ -109,7 +109,9 @@ export const SearchableRoomSelect: React.FC<SearchableRoomSelectProps> = ({
     <div className="relative" ref={dropdownRef}>
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <span className="material-icons text-slate-400 text-xl">meeting_room</span>
+          <span className="material-icons text-slate-400 text-xl">
+            meeting_room
+          </span>
         </div>
         <input
           type="text"
@@ -137,7 +139,9 @@ export const SearchableRoomSelect: React.FC<SearchableRoomSelectProps> = ({
         )}
         {!searchTerm && !disabled && (
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <span className="material-icons text-slate-400 text-xl">expand_more</span>
+            <span className="material-icons text-slate-400 text-xl">
+              expand_more
+            </span>
           </div>
         )}
       </div>

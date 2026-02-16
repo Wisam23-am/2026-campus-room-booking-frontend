@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { userService } from "../services/user.service";
 import { authService } from "../services/auth.service";
 import { User } from "../types";
 
@@ -21,14 +20,26 @@ export const UserProfilePage: React.FC = () => {
         setLoading(true);
         setError(null);
         const currentUser = authService.getCurrentUser();
-        if (currentUser?.id) {
-          const data = await userService.getUserById(currentUser.id);
-          setUser(data);
-          setFormData(data);
+        
+        if (!currentUser) {
+          setError("Anda belum login. Silakan login terlebih dahulu.");
+          setLoading(false);
+          return;
         }
+        
+        if (!currentUser.id) {
+          setError("Data pengguna tidak valid. Silakan login ulang.");
+          setLoading(false);
+          return;
+        }
+
+        const data = await authService.getCurrentUserFromAPI();
+        setUser(data);
+        setFormData(data);
       } catch (err) {
         console.error("Failed to fetch user profile:", err);
-        setError("Gagal memuat profil pengguna");
+        const errorMessage = err instanceof Error ? err.message : "Gagal memuat profil pengguna";
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -53,9 +64,8 @@ export const UserProfilePage: React.FC = () => {
     try {
       setSaving(true);
       setError(null);
-      await userService.updateUser(user.id, formData);
-      setUser(formData);
-      localStorage.setItem("current_user", JSON.stringify(formData));
+      const updatedUser = await authService.updateCurrentUser(formData.fullName, formData.email);
+      setUser(updatedUser);
       setIsEditing(false);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
@@ -82,8 +92,41 @@ export const UserProfilePage: React.FC = () => {
   if (loading) {
     return (
       <div className="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center">
-        <div className="text-slate-600 dark:text-slate-400">
-          Memuat profil...
+        <div className="flex flex-col items-center gap-3">
+          <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent"></div>
+          <div className="text-slate-600 dark:text-slate-400">
+            Memuat profil...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center">
+        <div className="max-w-md w-full mx-4">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6">
+            <div className="flex items-center gap-3 text-red-600 dark:text-red-400 mb-4">
+              <span className="material-icons text-3xl">error</span>
+              <h2 className="text-xl font-semibold">Error</h2>
+            </div>
+            <p className="text-slate-600 dark:text-slate-400 mb-4">{error}</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600"
+              >
+                Kembali ke Dashboard
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover"
+              >
+                Login Ulang
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -92,8 +135,22 @@ export const UserProfilePage: React.FC = () => {
   if (!user || !formData) {
     return (
       <div className="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center">
-        <div className="text-slate-600 dark:text-slate-400">
-          Profil tidak ditemukan
+        <div className="max-w-md w-full mx-4">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6 text-center">
+            <span className="material-icons text-6xl text-slate-400 mb-4">person_off</span>
+            <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-2">
+              Profil Tidak Ditemukan
+            </h2>
+            <p className="text-slate-600 dark:text-slate-400 mb-4">
+              Data profil Anda tidak dapat dimuat. Silakan coba login ulang.
+            </p>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover"
+            >
+              Login Ulang
+            </button>
+          </div>
         </div>
       </div>
     );
