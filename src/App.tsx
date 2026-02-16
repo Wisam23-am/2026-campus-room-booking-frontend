@@ -126,7 +126,7 @@ function App() {
           }
         />
         <Route
-          path="/rooms/schedule"
+          path="/rooms/:id/schedule"
           element={
             <ProtectedRoute allowedRoles={[0]}>
               <UserLayout>

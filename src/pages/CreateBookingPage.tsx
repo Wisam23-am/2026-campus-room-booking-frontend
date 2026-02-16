@@ -1,10 +1,13 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { bookingService } from "../services/booking.service";
 import { CreateBookingDto } from "../types";
+import { SearchableRoomSelect } from "../components/SearchableRoomSelect";
 
 export const CreateBookingPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [roomId, setRoomId] = useState<number | null>(null);
   const [formData, setFormData] = useState<CreateBookingDto>({
     roomName: "",
     bookedBy: "",
@@ -15,6 +18,33 @@ export const CreateBookingPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  // Pre-select room from URL parameter (e.g., /bookings/create?roomId=5)
+  useEffect(() => {
+    const roomIdParam = searchParams.get("roomId");
+    if (roomIdParam) {
+      const parsedId = parseInt(roomIdParam, 10);
+      if (!isNaN(parsedId)) {
+        setRoomId(parsedId);
+      }
+    }
+  }, [searchParams]);
+
+  const handleRoomSelect = (selectedRoomId: number | null, selectedRoomName: string) => {
+    setRoomId(selectedRoomId);
+    setFormData((prev) => ({
+      ...prev,
+      roomName: selectedRoomName,
+    }));
+    // Clear room name error when a room is selected
+    if (fieldErrors.roomName) {
+      setFieldErrors((prev) => {
+        const updated = { ...prev };
+        delete updated.roomName;
+        return updated;
+      });
+    }
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -142,30 +172,12 @@ export const CreateBookingPage: React.FC = () => {
                     >
                       Select Room *
                     </label>
-                    <div className="relative mt-1">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <span className="material-icons text-neutral-400 text-xl">
-                          meeting_room
-                        </span>
-                      </div>
-                      <input
-                        className={`block w-full pl-10 pr-10 py-2.5 border rounded-lg focus:ring-primary focus:border-primary sm:text-sm shadow-sm placeholder-neutral-400 dark:bg-[#0f172a] ${
-                          fieldErrors.roomName
-                            ? "border-red-500 dark:border-red-500"
-                            : "border-neutral-300 dark:border-neutral-600"
-                        }`}
-                        id="roomName"
-                        placeholder="Enter room name (e.g., 'Lab 304')..."
-                        type="text"
-                        value={formData.roomName}
-                        onChange={handleInputChange}
-                      />
-                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <span className="material-icons text-neutral-400 text-xl">
-                          expand_more
-                        </span>
-                      </div>
-                    </div>
+                    <SearchableRoomSelect
+                      value={roomId}
+                      onChange={handleRoomSelect}
+                      error={fieldErrors.roomName}
+                      disabled={loading}
+                    />
                     {fieldErrors.roomName && (
                       <p className="mt-1 text-xs text-red-500">
                         {fieldErrors.roomName}
