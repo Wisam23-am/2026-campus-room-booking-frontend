@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { bookingService } from "../services/booking.service";
 import { RoomBooking } from "../types";
 
@@ -123,23 +122,23 @@ export const AdminApprovalsPage: React.FC = () => {
               </h1>
             </div>
             <div className="flex items-center gap-4">
-              <Link
+              <button
                 aria-label="Notifications"
                 className="p-2 text-slate-500 hover:text-primary transition-colors relative"
-                to="/notifications"
+                onClick={() => {}}
               >
                 <span className="material-icons">notifications</span>
                 <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500"></span>
-              </Link>
+              </button>
               <div className="flex items-center gap-2">
-                <Link to="/profile" aria-label="Profile">
+                <div aria-label="Profile">
                   <img
                     alt="Admin Profile"
                     className="h-8 w-8 rounded-full"
                     data-alt="Admin user avatar"
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5i78g5hSU2uL5Fy8QwqkoXO6lWwdRpAPW9WyvsZlgFovtGXJSTIuzuLs0Vo9WH60X_y2qxaVsugJHktErPTil1f8wSeHDDsh9rihFd79R2qcq7I7o4TaE-NUERlJeBqzMtJh7wv8Q1bzu7oCsodtMmY2UjphAkgXv08IC3T87oOL6UqOAMrrpSAqXeWKfimtdh2p8ohZsDz41fI3LET_2akp6-U8Tp8l5HfIocyNHI2rekvpo4Be4WbNrd1R7rJ7tBQNu4UxPDVg"
                   />
-                </Link>
+                </div>
                 <span className="text-sm font-medium hidden sm:block">
                   Admin User
                 </span>

@@ -97,14 +97,14 @@ export const AdminRoomsPage: React.FC = () => {
               </nav>
             </div>
             <div className="flex items-center gap-3">
-              <Link
+              <button
                 aria-label="Notifications"
                 className="p-2 text-slate-400 hover:text-primary transition-colors relative"
-                to="/notifications"
+                onClick={() => {}}
               >
                 <span className="material-icons">notifications</span>
                 <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white dark:border-slate-900"></span>
-              </Link>
+              </button>
               <Link
                 aria-label="Help"
                 className="p-2 text-slate-400 hover:text-primary transition-colors"

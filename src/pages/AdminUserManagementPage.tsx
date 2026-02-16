@@ -86,14 +86,14 @@ export const AdminUserManagementPage: React.FC = () => {
               Manajemen Pengguna
             </h1>
             <div className="flex items-center gap-3">
-              <Link
+              <button
                 aria-label="Notifications"
                 className="p-2 text-slate-400 hover:text-primary rounded-full hover:bg-primary/5 transition-colors relative"
-                to="/notifications"
+                onClick={() => {}}
               >
                 <span className="material-icons-round">notifications</span>
                 <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border-2 border-surface-light dark:border-surface-dark"></span>
-              </Link>
+              </button>
               <button className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm shadow-primary/30 transition-all">
                 <span className="material-icons-round text-base">add</span>
                 <span>Tambah User</span>

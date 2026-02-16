@@ -10,76 +10,8 @@ export const ProfileSecurityPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-background-light dark:bg-background-dark font-display text-text-main dark:text-gray-100 min-h-screen flex flex-col">
-      {/* Top Navigation Bar */}
-      <header className="bg-surface-light dark:bg-surface-dark border-b border-border-light dark:border-border-dark sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex">
-              <div className="flex-shrink-0 flex items-center">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-bold">
-                    C
-                  </div>
-                  <span className="font-bold text-lg tracking-tight text-gray-900 dark:text-white">
-                    CampusBook
-                  </span>
-                </div>
-              </div>
-              <nav
-                aria-label="Global"
-                className="hidden sm:ml-8 sm:flex sm:space-x-8"
-              >
-                <Link
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-text-muted hover:text-primary dark:hover:text-primary transition-colors"
-                  to="/dashboard"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-text-muted hover:text-primary dark:hover:text-primary transition-colors"
-                  to="/bookings"
-                >
-                  Booking Ruangan
-                </Link>
-                <Link
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-text-muted hover:text-primary dark:hover:text-primary transition-colors"
-                  to="/rooms/schedule"
-                >
-                  Jadwal Saya
-                </Link>
-              </nav>
-            </div>
-            <div className="flex items-center">
-              <Link
-                className="bg-surface-light dark:bg-surface-dark p-1 rounded-full text-text-muted hover:text-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-                to="/notifications"
-                aria-label="Notifications"
-              >
-                <span className="sr-only">View notifications</span>
-                <span className="material-icons text-xl">notifications</span>
-              </Link>
-              <div className="ml-3 relative flex items-center gap-2 cursor-pointer">
-                <div className="text-right hidden sm:block">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    Budi Santoso
-                  </p>
-                  <p className="text-xs text-text-muted">Mahasiswa</p>
-                </div>
-                <img
-                  alt="Student avatar"
-                  className="h-8 w-8 rounded-full bg-gray-300 object-cover"
-                  data-alt="Profile avatar of a student"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWv7a2xvR0kioJRe1vPDbBQBwuZS7uZZ7LCfJqeeiUBKQbv4IZqj1Lr8q0XmW_jX5A2QrcNGRuTRgBKN14n7Pd-Z-2BPUpzN9rCkRGxRFQ1Y05swCx3wsBbrF4GaR-kOpiPYhAXougcXREGvY0tS_7MNhVHpE4sxkPzIwo-jihNo9Jn9C_rSeSDYMDeQ4AH_cupzdj6XMD_cqXOk_CxbiS0GRfqpK9EIhP-u919FKz1b2RUV3ltBmxYgqcI1S91T3uz7ME_wlSg-I"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">
           {/* Sidebar Navigation */}
           <aside className="py-6 lg:col-span-3">
@@ -361,16 +293,7 @@ export const ProfileSecurityPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-surface-light dark:bg-surface-dark border-t border-border-light dark:border-border-dark mt-auto">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm text-text-muted">
-            © 2023 CampusBook System. Hak cipta dilindungi undang-undang.
-          </p>
-        </div>
-      </footer>
+      </div>
     </div>
   );
 };

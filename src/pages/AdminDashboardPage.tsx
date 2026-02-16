@@ -192,14 +192,14 @@ export const AdminDashboardPage: React.FC = () => {
         </nav>
         <div className="p-4 border-t border-slate-100 dark:border-slate-800/50">
           <div className="flex items-center gap-3">
-            <Link to="/profile" aria-label="Profile">
+            <div aria-label="Profile">
               <img
                 alt="Administrator profile"
                 className="h-10 w-10 rounded-full object-cover border border-slate-200 dark:border-slate-700"
                 data-alt="Profile picture of an administrator"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQ6cce0AuMviIi8ITIHeKkgqf70oFreYvKP6Umfnwi9SMAAXrnuBgGeEMHxpVSL7dpNmlpRkQX-M0NbWAalxqAJ-edaDUtBFJuSumy0Bg7OwmgQYqeyDTrivNIBX4ZMtzssaNGgH-XSpKbN2nlXlNI0bMWobzs9UWSIOA_hNj8op3FM8ClQiPxVU9bppoy2SYRGv1Z-ILl4pWpbVGL5vgHuw1Jrj_aFN-397wKfZGVSF8VZh1kr91HfUZEPM1TkPY40lFINXnImq8"
               />
-            </Link>
+            </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
                 Admin User
@@ -236,14 +236,14 @@ export const AdminDashboardPage: React.FC = () => {
                 type="text"
               />
             </div>
-            <Link
+            <button
               aria-label="Notifications"
               className="relative p-2 text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-white transition-colors"
-              to="/notifications"
+              onClick={() => {}}
             >
               <span className="material-icons-outlined">notifications</span>
               <span className="absolute top-2 right-2 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-[#151f2b]"></span>
-            </Link>
+            </button>
           </div>
         </header>
         <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 space-y-6">

@@ -66,14 +66,14 @@ export const AdminSystemSettingsPage: React.FC = () => {
           </nav>
           <div className="border-t border-slate-200 p-4 dark:border-slate-800">
             <div className="flex items-center gap-3">
-              <Link to="/profile" aria-label="Profile">
+              <div aria-label="Profile">
                 <img
                   alt="User Profile"
                   className="h-9 w-9 rounded-full object-cover ring-2 ring-white dark:ring-slate-700"
                   data-alt="Admin user avatar"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQIY0fEd_jXyTC7Z6OMqF7Ko3fXoimYddJdMEkZc3FdEFlcwKiJvgibGij_EVy-QWs2JgQ0vkRvMe4RAiopWAeqqG0pF7DHUkwB9rs4cPzmSTZnnbOKm8KwcPjsOpfeL3oncwm9-5_3rarcspdFZ4Eban_nFqtaPX34ivFla0SlnZQvjSnRdmEAFuyahElpCKuQGyHtv5OkxJlkvNkX6YB5Rp5MVBC1ZWVPr9Gmn4SIwjUA2t6eiYC1V7ZRzn-ffV_82n7UM-wxIg"
                 />
-              </Link>
+              </div>
               <div className="flex-1 overflow-hidden">
                 <h4 className="truncate text-sm font-medium text-slate-900 dark:text-white">
                   Administrator
@@ -114,15 +114,15 @@ export const AdminSystemSettingsPage: React.FC = () => {
               </nav>
             </div>
             <div className="flex items-center gap-4">
-              <Link
+              <button
                 aria-label="Notifications"
                 className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-                to="/notifications"
+                onClick={() => {}}
               >
                 <span className="material-icons text-[20px]">
                   notifications_none
                 </span>
-              </Link>
+              </button>
             </div>
           </header>
 
