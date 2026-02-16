@@ -17,7 +17,7 @@ export const ProfileSecurityPage: React.FC = () => {
   // Calculate password strength
   const getPasswordStrength = (password: string) => {
     if (!password) return { score: 0, label: "Lemah", color: "red" };
-    
+
     let score = 0;
     if (password.length >= 8) score++;
     if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
@@ -63,7 +63,7 @@ export const ProfileSecurityPage: React.FC = () => {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      
+
       // Redirect after success
       setTimeout(() => {
         navigate("/profile");
@@ -230,12 +230,16 @@ export const ProfileSecurityPage: React.FC = () => {
                         onChange={(e) => setCurrentPassword(e.target.value)}
                         disabled={loading}
                       />
-                      <div 
+                      <div
                         className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer hover:text-primary transition-colors group"
-                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        onClick={() =>
+                          setShowCurrentPassword(!showCurrentPassword)
+                        }
                       >
                         <span className="material-icons text-gray-400 group-hover:text-primary text-sm">
-                          {showCurrentPassword ? "visibility_off" : "visibility"}
+                          {showCurrentPassword
+                            ? "visibility_off"
+                            : "visibility"}
                         </span>
                       </div>
                     </div>
@@ -274,7 +278,7 @@ export const ProfileSecurityPage: React.FC = () => {
                         onChange={(e) => setNewPassword(e.target.value)}
                         disabled={loading}
                       />
-                      <div 
+                      <div
                         className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer hover:text-primary transition-colors group"
                         onClick={() => setShowNewPassword(!showNewPassword)}
                       >
@@ -290,28 +294,58 @@ export const ProfileSecurityPage: React.FC = () => {
                         <div className="flex justify-between items-center mb-1">
                           <span className="text-xs font-medium text-text-muted">
                             Kekuatan Password:{" "}
-                            <span className={`font-bold ${
-                              passwordStrength.color === "green" ? "text-green-600 dark:text-green-400" :
-                              passwordStrength.color === "yellow" ? "text-yellow-600 dark:text-yellow-400" :
-                              "text-red-600 dark:text-red-400"
-                            }`}>
+                            <span
+                              className={`font-bold ${
+                                passwordStrength.color === "green"
+                                  ? "text-green-600 dark:text-green-400"
+                                  : passwordStrength.color === "yellow"
+                                    ? "text-yellow-600 dark:text-yellow-400"
+                                    : "text-red-600 dark:text-red-400"
+                              }`}
+                            >
                               {passwordStrength.label}
                             </span>
                           </span>
                         </div>
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 flex gap-1 overflow-hidden">
-                          <div className={`h-1.5 w-1/3 rounded-full ${passwordStrength.score >= 1 ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
-                          <div className={`h-1.5 w-1/3 rounded-full ${passwordStrength.score >= 2 ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
-                          <div className={`h-1.5 w-1/3 rounded-full ${passwordStrength.score >= 3 ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
+                          <div
+                            className={`h-1.5 w-1/3 rounded-full ${passwordStrength.score >= 1 ? "bg-primary" : "bg-gray-300 dark:bg-gray-600"}`}
+                          ></div>
+                          <div
+                            className={`h-1.5 w-1/3 rounded-full ${passwordStrength.score >= 2 ? "bg-primary" : "bg-gray-300 dark:bg-gray-600"}`}
+                          ></div>
+                          <div
+                            className={`h-1.5 w-1/3 rounded-full ${passwordStrength.score >= 3 ? "bg-primary" : "bg-gray-300 dark:bg-gray-600"}`}
+                          ></div>
                         </div>
                         <ul className="mt-2 text-xs text-text-muted space-y-1 list-disc pl-4">
-                          <li className={newPassword.length >= 8 ? "text-green-600 dark:text-green-400" : ""}>
+                          <li
+                            className={
+                              newPassword.length >= 8
+                                ? "text-green-600 dark:text-green-400"
+                                : ""
+                            }
+                          >
                             Minimal 8 karakter
                           </li>
-                          <li className={/[a-z]/.test(newPassword) && /[A-Z]/.test(newPassword) ? "text-green-600 dark:text-green-400" : ""}>
+                          <li
+                            className={
+                              /[a-z]/.test(newPassword) &&
+                              /[A-Z]/.test(newPassword)
+                                ? "text-green-600 dark:text-green-400"
+                                : ""
+                            }
+                          >
                             Mengandung huruf besar &amp; kecil
                           </li>
-                          <li className={/\d/.test(newPassword) || /[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? "text-green-600 dark:text-green-400" : ""}>
+                          <li
+                            className={
+                              /\d/.test(newPassword) ||
+                              /[!@#$%^&*(),.?":{}|<>]/.test(newPassword)
+                                ? "text-green-600 dark:text-green-400"
+                                : ""
+                            }
+                          >
                             Mengandung angka atau simbol
                           </li>
                         </ul>
@@ -336,7 +370,9 @@ export const ProfileSecurityPage: React.FC = () => {
                       <input
                         autoComplete="new-password"
                         className={`focus:ring-primary focus:border-primary block w-full pl-10 pr-10 sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-surface-dark dark:text-white rounded-md h-10 ${
-                          confirmPassword && newPassword !== confirmPassword ? 'border-red-500 dark:border-red-500' : ''
+                          confirmPassword && newPassword !== confirmPassword
+                            ? "border-red-500 dark:border-red-500"
+                            : ""
                         }`}
                         id="confirm-password"
                         name="confirm-password"
@@ -346,12 +382,16 @@ export const ProfileSecurityPage: React.FC = () => {
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         disabled={loading}
                       />
-                      <div 
+                      <div
                         className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer hover:text-primary transition-colors group"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
                       >
                         <span className="material-icons text-gray-400 group-hover:text-primary text-sm">
-                          {showConfirmPassword ? "visibility_off" : "visibility"}
+                          {showConfirmPassword
+                            ? "visibility_off"
+                            : "visibility"}
                         </span>
                       </div>
                     </div>
@@ -373,11 +413,19 @@ export const ProfileSecurityPage: React.FC = () => {
                     <button
                       className="w-full sm:w-auto inline-flex justify-center items-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       type="submit"
-                      disabled={loading || !currentPassword || !newPassword || !confirmPassword || newPassword !== confirmPassword}
+                      disabled={
+                        loading ||
+                        !currentPassword ||
+                        !newPassword ||
+                        !confirmPassword ||
+                        newPassword !== confirmPassword
+                      }
                     >
                       {loading ? (
                         <>
-                          <span className="animate-spin material-icons text-base mr-2">refresh</span>
+                          <span className="animate-spin material-icons text-base mr-2">
+                            refresh
+                          </span>
                           Memproses...
                         </>
                       ) : (
