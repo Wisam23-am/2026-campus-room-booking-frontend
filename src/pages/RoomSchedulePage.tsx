@@ -1,11 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { UserLayout } from "../components/layouts/UserLayout";
 
 export const RoomSchedulePage: React.FC = () => {
   return (
-    <UserLayout headerTitle="Jadwal Saya">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <nav aria-label="Breadcrumb" className="flex mb-6">
           <ol className="flex items-center space-x-2 text-sm text-slate-500 dark:text-slate-400">
             <li>
@@ -385,34 +384,6 @@ export const RoomSchedulePage: React.FC = () => {
           </div>
         </div>
       </div>
-      <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-slate-500 dark:text-slate-400 text-sm">
-              (c) 2023 University Campus Booking System. All rights reserved.
-            </div>
-            <div className="flex space-x-6">
-              <Link
-                className="text-slate-400 hover:text-slate-500 dark:hover:text-slate-300"
-                to="/dashboard"
-              >
-                <span className="sr-only">Help</span>
-                <span className="material-icons text-sm">
-                  help_outline
-                </span>{" "}
-                Help Center
-              </Link>
-              <Link
-                className="text-slate-400 hover:text-slate-500 dark:hover:text-slate-300"
-                to="/dashboard"
-              >
-                <span className="sr-only">Privacy</span>
-                <span className="text-sm">Privacy Policy</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </UserLayout>
+    </div>
   );
 };

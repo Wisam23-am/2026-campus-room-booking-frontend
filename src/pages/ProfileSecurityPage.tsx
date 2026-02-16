@@ -1,6 +1,5 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { UserLayout } from "../components/layouts/UserLayout";
 
 export const ProfileSecurityPage: React.FC = () => {
   const navigate = useNavigate();
@@ -11,8 +10,8 @@ export const ProfileSecurityPage: React.FC = () => {
   };
 
   return (
-    <UserLayout headerTitle="Keamanan Profil">
-      <div className="py-2">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">
           {/* Sidebar Navigation */}
           <aside className="py-6 lg:col-span-3">
@@ -295,14 +294,6 @@ export const ProfileSecurityPage: React.FC = () => {
           </div>
         </div>
       </div>
-
-      <footer className="bg-surface-light dark:bg-surface-dark border-t border-border-light dark:border-border-dark mt-auto">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm text-text-muted">
-            © 2023 CampusBook System. Hak cipta dilindungi undang-undang.
-          </p>
-        </div>
-      </footer>
-    </UserLayout>
+    </div>
   );
 };
