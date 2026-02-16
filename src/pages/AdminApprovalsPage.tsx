@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { bookingService } from "../services/booking.service";
 import { RoomBooking } from "../types";
-import { AdminLayout } from "../components/layouts/AdminLayout";
 
 export const AdminApprovalsPage: React.FC = () => {
   const [bookings, setBookings] = useState<RoomBooking[]>([]);
@@ -111,7 +109,44 @@ export const AdminApprovalsPage: React.FC = () => {
   };
 
   return (
-    <AdminLayout headerTitle="Approval Queue">
+    <div className="font-display bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 min-h-screen flex flex-col">
+      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 bg-primary rounded flex items-center justify-center text-white font-bold">
+                CB
+              </div>
+              <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                CampusBook Admin
+              </h1>
+            </div>
+            <div className="flex items-center gap-4">
+              <button
+                aria-label="Notifications"
+                className="p-2 text-slate-500 hover:text-primary transition-colors relative"
+                onClick={() => {}}
+              >
+                <span className="material-icons">notifications</span>
+                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500"></span>
+              </button>
+              <div className="flex items-center gap-2">
+                <div aria-label="Profile">
+                  <img
+                    alt="Admin Profile"
+                    className="h-8 w-8 rounded-full"
+                    data-alt="Admin user avatar"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5i78g5hSU2uL5Fy8QwqkoXO6lWwdRpAPW9WyvsZlgFovtGXJSTIuzuLs0Vo9WH60X_y2qxaVsugJHktErPTil1f8wSeHDDsh9rihFd79R2qcq7I7o4TaE-NUERlJeBqzMtJh7wv8Q1bzu7oCsodtMmY2UjphAkgXv08IC3T87oOL6UqOAMrrpSAqXeWKfimtdh2p8ohZsDz41fI3LET_2akp6-U8Tp8l5HfIocyNHI2rekvpo4Be4WbNrd1R7rJ7tBQNu4UxPDVg"
+                  />
+                </div>
+                <span className="text-sm font-medium hidden sm:block">
+                  Admin User
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
         <div className="sm:flex sm:items-center sm:justify-between mb-8">
           <div>
@@ -518,6 +553,6 @@ export const AdminApprovalsPage: React.FC = () => {
           </div>
         </div>
       )}
-    </AdminLayout>
+    </div>
   );
 };
