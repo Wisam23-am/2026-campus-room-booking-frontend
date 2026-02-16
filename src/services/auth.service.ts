@@ -64,6 +64,44 @@ export const authService = {
     }
   },
 
+  async getCurrentUserFromAPI(): Promise<User> {
+    try {
+      const response = await apiClient.get<User>('/api/auth/me');
+      
+      // Update localStorage with fresh data
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(response.data));
+      
+      return response.data;
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Gagal memuat profil';
+      throw new Error(message);
+    }
+  },
+
+  async updateCurrentUser(fullName: string, email: string): Promise<User> {
+    try {
+      const response = await apiClient.put<User>('/api/auth/me', {
+        fullName,
+        email,
+        role: 0, // Dummy value to satisfy DTO validation, will be ignored by backend
+      });
+
+      // Update localStorage with updated data
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(response.data));
+
+      return response.data;
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Gagal memperbarui profil';
+      throw new Error(message);
+    }
+  },
+
   getToken(): string | null {
     return localStorage.getItem(AUTH_TOKEN_KEY);
   },

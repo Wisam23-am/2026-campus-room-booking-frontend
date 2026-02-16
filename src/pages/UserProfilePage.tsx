@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { userService } from "../services/user.service";
 import { authService } from "../services/auth.service";
 import { User } from "../types";
 
@@ -34,7 +33,7 @@ export const UserProfilePage: React.FC = () => {
           return;
         }
 
-        const data = await userService.getUserById(currentUser.id);
+        const data = await authService.getCurrentUserFromAPI();
         setUser(data);
         setFormData(data);
       } catch (err) {
@@ -65,9 +64,8 @@ export const UserProfilePage: React.FC = () => {
     try {
       setSaving(true);
       setError(null);
-      await userService.updateUser(user.id, formData);
-      setUser(formData);
-      localStorage.setItem("current_user", JSON.stringify(formData));
+      const updatedUser = await authService.updateCurrentUser(formData.fullName, formData.email);
+      setUser(updatedUser);
       setIsEditing(false);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
