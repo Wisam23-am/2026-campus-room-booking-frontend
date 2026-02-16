@@ -111,26 +111,26 @@ export const AdminApprovalsPage: React.FC = () => {
   return (
     <>
       <div className="p-4 sm:p-6 lg:p-8">
-      <div className="sm:flex sm:items-center sm:justify-between mb-8">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-            Approval Queue
-            <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-sm font-medium text-primary ring-1 ring-inset ring-primary/20">
-              {bookings.length} Pending
-            </span>
-          </h2>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Manage incoming room booking requests from students and faculty.
-          </p>
-        </div>
-        <div className="mt-4 sm:ml-16 sm:mt-0 flex gap-2">
-          <button
-            className="inline-flex items-center rounded bg-white dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-slate-900 dark:text-slate-200 shadow-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50"
-            type="button"
-            disabled={loading}
-            onClick={() => window.location.reload()}
-          >
-            <span className="material-icons text-lg mr-1.5 text-slate-400">
+        <div className="sm:flex sm:items-center sm:justify-between mb-8">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+              Approval Queue
+              <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-sm font-medium text-primary ring-1 ring-inset ring-primary/20">
+                {bookings.length} Pending
+              </span>
+            </h2>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              Manage incoming room booking requests from students and faculty.
+            </p>
+          </div>
+          <div className="mt-4 sm:ml-16 sm:mt-0 flex gap-2">
+            <button
+              className="inline-flex items-center rounded bg-white dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-slate-900 dark:text-slate-200 shadow-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50"
+              type="button"
+              disabled={loading}
+              onClick={() => window.location.reload()}
+            >
+              <span className="material-icons text-lg mr-1.5 text-slate-400">
                 refresh
               </span>
               Refresh

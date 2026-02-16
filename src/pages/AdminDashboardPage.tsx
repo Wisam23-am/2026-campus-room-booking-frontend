@@ -121,322 +121,320 @@ export const AdminDashboardPage: React.FC = () => {
           {error}
         </div>
       )}
+      <h2 className="text-2xl font-bold pb-4 leading-7 text-slate-900 dark:text-white sm:text-3xl sm:truncate">
+        Admin Dashboard
+      </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-                    Occupancy Rate
-                  </p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    {loading ? "..." : `${stats.occupancyRate.toFixed(1)}%`}
-                  </h3>
-                </div>
-                <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-primary">
-                  <span className="material-icons-outlined text-xl">
-                    trending_up
-                  </span>
-                </div>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                Rooms in use
+        <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                Occupancy Rate
               </p>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+                {loading ? "..." : `${stats.occupancyRate.toFixed(1)}%`}
+              </h3>
             </div>
-            <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-                    Pending Approvals
-                  </p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    {loading ? "..." : stats.pendingApprovals}
-                  </h3>
-                </div>
-                <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg text-orange-500">
-                  <span className="material-icons-outlined text-xl">
-                    hourglass_empty
-                  </span>
-                </div>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                Waiting for review
-              </p>
-            </div>
-            <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-                    Completed Bookings
-                  </p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    {loading ? "..." : stats.completedBookings}
-                  </h3>
-                </div>
-                <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg text-green-500">
-                  <span className="material-icons-outlined text-xl">
-                    check_circle
-                  </span>
-                </div>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                Successfully completed
-              </p>
-            </div>
-            <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-                    Rejection Rate
-                  </p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    {loading ? "..." : `${stats.rejectionRate.toFixed(1)}%`}
-                  </h3>
-                </div>
-                <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-500">
-                  <span className="material-icons-outlined text-xl">
-                    cancel
-                  </span>
-                </div>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                Denied requests
-              </p>
+            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-primary">
+              <span className="material-icons-outlined text-xl">
+                trending_up
+              </span>
             </div>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 bg-white dark:bg-[#151f2b] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
-              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                <h2 className="font-bold text-slate-900 dark:text-white">
-                  Recent Approved Bookings
-                </h2>
-                <Link
-                  className="text-sm font-medium text-primary hover:text-blue-600 transition-colors"
-                  to="/admin/approvals"
-                >
-                  View All
-                </Link>
-              </div>
-              {loading ? (
-                <div className="p-8 text-center">
-                  <div className="w-8 h-8 border-4 border-slate-200 dark:border-slate-700 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-slate-500 dark:text-slate-400">
-                    Loading bookings...
-                  </p>
-                </div>
-              ) : recentBookings.length === 0 ? (
-                <div className="p-8 text-center">
-                  <span className="material-icons text-slate-300 text-3xl block mb-2">
-                    event_busy
-                  </span>
-                  <p className="text-slate-500">No recent bookings</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm">
-                    <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider font-semibold">
-                      <tr>
-                        <th className="px-6 py-3">User</th>
-                        <th className="px-6 py-3">Room &amp; Purpose</th>
-                        <th className="px-6 py-3">Date & Time</th>
-                        <th className="px-6 py-3 text-right">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                      {recentBookings.map((booking) => (
-                        <tr
-                          key={booking.id}
-                          className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
-                        >
-                          <td className="px-6 py-4">
-                            <div className="flex items-center">
-                              <div className="h-8 w-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold mr-3">
-                                {booking.bookedBy.charAt(0).toUpperCase()}
-                              </div>
-                              <div>
-                                <div className="font-medium text-slate-900 dark:text-white">
-                                  {booking.bookedBy}
-                                </div>
-                                <div className="text-xs text-slate-500">
-                                  Booking #{booking.id}
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+            Rooms in use
+          </p>
+        </div>
+        <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                Pending Approvals
+              </p>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+                {loading ? "..." : stats.pendingApprovals}
+              </h3>
+            </div>
+            <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg text-orange-500">
+              <span className="material-icons-outlined text-xl">
+                hourglass_empty
+              </span>
+            </div>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+            Waiting for review
+          </p>
+        </div>
+        <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                Completed Bookings
+              </p>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+                {loading ? "..." : stats.completedBookings}
+              </h3>
+            </div>
+            <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg text-green-500">
+              <span className="material-icons-outlined text-xl">
+                check_circle
+              </span>
+            </div>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+            Successfully completed
+          </p>
+        </div>
+        <div className="bg-white dark:bg-[#151f2b] p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                Rejection Rate
+              </p>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+                {loading ? "..." : `${stats.rejectionRate.toFixed(1)}%`}
+              </h3>
+            </div>
+            <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-500">
+              <span className="material-icons-outlined text-xl">cancel</span>
+            </div>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+            Denied requests
+          </p>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-white dark:bg-[#151f2b] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col">
+          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+            <h2 className="font-bold text-slate-900 dark:text-white">
+              Recent Approved Bookings
+            </h2>
+            <Link
+              className="text-sm font-medium text-primary hover:text-blue-600 transition-colors"
+              to="/admin/approvals"
+            >
+              View All
+            </Link>
+          </div>
+          {loading ? (
+            <div className="p-8 text-center">
+              <div className="w-8 h-8 border-4 border-slate-200 dark:border-slate-700 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-slate-500 dark:text-slate-400">
+                Loading bookings...
+              </p>
+            </div>
+          ) : recentBookings.length === 0 ? (
+            <div className="p-8 text-center">
+              <span className="material-icons text-slate-300 text-3xl block mb-2">
+                event_busy
+              </span>
+              <p className="text-slate-500">No recent bookings</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider font-semibold">
+                  <tr>
+                    <th className="px-6 py-3">User</th>
+                    <th className="px-6 py-3">Room &amp; Purpose</th>
+                    <th className="px-6 py-3">Date & Time</th>
+                    <th className="px-6 py-3 text-right">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {recentBookings.map((booking) => (
+                    <tr
+                      key={booking.id}
+                      className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          <div className="h-8 w-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold mr-3">
+                            {booking.bookedBy.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
                             <div className="font-medium text-slate-900 dark:text-white">
-                              {booking.roomName || "Room"}
+                              {booking.bookedBy}
                             </div>
                             <div className="text-xs text-slate-500">
-                              {booking.purpose || "-"}
+                              Booking #{booking.id}
                             </div>
-                          </td>
-                          <td className="px-6 py-4 text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                            {new Date(booking.startTime).toLocaleDateString()},{" "}
-                            {new Date(booking.startTime).toLocaleTimeString(
-                              [],
-                              {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              },
-                            )}
-                          </td>
-                          <td className="px-6 py-4 text-right">
-                            <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                                booking.status,
-                              )}`}
-                            >
-                              <span
-                                className={`w-1.5 h-1.5 rounded-full ${getStatusDotColor(
-                                  booking.status,
-                                )} mr-1.5`}
-                              ></span>
-                              {getStatusLabel(booking.status)}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="font-medium text-slate-900 dark:text-white">
+                          {booking.roomName || "Room"}
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          {booking.purpose || "-"}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-slate-600 dark:text-slate-400 whitespace-nowrap">
+                        {new Date(booking.startTime).toLocaleDateString()},{" "}
+                        {new Date(booking.startTime).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                            booking.status,
+                          )}`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${getStatusDotColor(
+                              booking.status,
+                            )} mr-1.5`}
+                          ></span>
+                          {getStatusLabel(booking.status)}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <div className="bg-white dark:bg-[#151f2b] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 flex flex-col">
-              <h2 className="font-bold text-slate-900 dark:text-white mb-6">
-                Top 5 Spaces
-              </h2>
-              <div className="space-y-5 flex-1">
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="font-medium text-slate-700 dark:text-slate-200">
-                      Lecture Hall A
-                    </span>
-                    <span className="text-slate-500">92% util</span>
-                  </div>
-                  <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2">
-                    <div
-                      className="bg-primary h-2 rounded-full"
-                      style={{ width: "92%" }}
-                    ></div>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="font-medium text-slate-700 dark:text-slate-200">
-                      Study Room 4B
-                    </span>
-                    <span className="text-slate-500">85% util</span>
-                  </div>
-                  <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2">
-                    <div
-                      className="bg-primary/80 h-2 rounded-full"
-                      style={{ width: "85%" }}
-                    ></div>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="font-medium text-slate-700 dark:text-slate-200">
-                      Conf Room B
-                    </span>
-                    <span className="text-slate-500">74% util</span>
-                  </div>
-                  <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2">
-                    <div
-                      className="bg-primary/60 h-2 rounded-full"
-                      style={{ width: "74%" }}
-                    ></div>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="font-medium text-slate-700 dark:text-slate-200">
-                      Innovation Lab
-                    </span>
-                    <span className="text-slate-500">60% util</span>
-                  </div>
-                  <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2">
-                    <div
-                      className="bg-primary/40 h-2 rounded-full"
-                      style={{ width: "60%" }}
-                    ></div>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="font-medium text-slate-700 dark:text-slate-200">
-                      Media Center
-                    </span>
-                    <span className="text-slate-500">45% util</span>
-                  </div>
-                  <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2">
-                    <div
-                      className="bg-primary/20 h-2 rounded-full"
-                      style={{ width: "45%" }}
-                    ></div>
-                  </div>
-                </div>
+          )}
+        </div>
+        <div className="bg-white dark:bg-[#151f2b] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 flex flex-col">
+          <h2 className="font-bold text-slate-900 dark:text-white mb-6">
+            Top 5 Spaces
+          </h2>
+          <div className="space-y-5 flex-1">
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span className="font-medium text-slate-700 dark:text-slate-200">
+                  Lecture Hall A
+                </span>
+                <span className="text-slate-500">92% util</span>
+              </div>
+              <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2">
+                <div
+                  className="bg-primary h-2 rounded-full"
+                  style={{ width: "92%" }}
+                ></div>
               </div>
             </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pb-6">
-            <Link
-              className="group bg-white dark:bg-[#151f2b] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-primary dark:hover:border-primary transition-all flex items-center gap-4"
-              to="/admin/dashboard"
-            >
-              <div className="h-10 w-10 rounded-lg bg-orange-50 dark:bg-orange-900/20 text-orange-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <span className="material-icons-outlined">build</span>
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span className="font-medium text-slate-700 dark:text-slate-200">
+                  Study Room 4B
+                </span>
+                <span className="text-slate-500">85% util</span>
               </div>
-              <div>
-                <h4 className="font-bold text-sm text-slate-900 dark:text-white">
-                  Maintenance
-                </h4>
-                <p className="text-xs text-slate-500">Create ticket</p>
+              <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2">
+                <div
+                  className="bg-primary/80 h-2 rounded-full"
+                  style={{ width: "85%" }}
+                ></div>
               </div>
-            </Link>
-            <Link
-              className="group bg-white dark:bg-[#151f2b] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-primary dark:hover:border-primary transition-all flex items-center gap-4"
-              to="/admin/rooms"
-            >
-              <div className="h-10 w-10 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <span className="material-icons-outlined">block</span>
+            </div>
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span className="font-medium text-slate-700 dark:text-slate-200">
+                  Conf Room B
+                </span>
+                <span className="text-slate-500">74% util</span>
               </div>
-              <div>
-                <h4 className="font-bold text-sm text-slate-900 dark:text-white">
-                  Block Room
-                </h4>
-                <p className="text-xs text-slate-500">Restrict access</p>
+              <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2">
+                <div
+                  className="bg-primary/60 h-2 rounded-full"
+                  style={{ width: "74%" }}
+                ></div>
               </div>
-            </Link>
-            <Link
-              className="group bg-white dark:bg-[#151f2b] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-primary dark:hover:border-primary transition-all flex items-center gap-4"
-              to="/admin/reports"
-            >
-              <div className="h-10 w-10 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <span className="material-icons-outlined">description</span>
+            </div>
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span className="font-medium text-slate-700 dark:text-slate-200">
+                  Innovation Lab
+                </span>
+                <span className="text-slate-500">60% util</span>
               </div>
-              <div>
-                <h4 className="font-bold text-sm text-slate-900 dark:text-white">
-                  Weekly Report
-                </h4>
-                <p className="text-xs text-slate-500">Download PDF</p>
+              <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2">
+                <div
+                  className="bg-primary/40 h-2 rounded-full"
+                  style={{ width: "60%" }}
+                ></div>
               </div>
-            </Link>
-            <Link
-              className="group bg-white dark:bg-[#151f2b] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-primary dark:hover:border-primary transition-all flex items-center gap-4"
-              to="/admin/users"
-            >
-              <div className="h-10 w-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
-                <span className="material-icons-outlined">person_add</span>
+            </div>
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span className="font-medium text-slate-700 dark:text-slate-200">
+                  Media Center
+                </span>
+                <span className="text-slate-500">45% util</span>
               </div>
-              <div>
-                <h4 className="font-bold text-sm text-slate-900 dark:text-white">
-                  Add User
-                </h4>
-                <p className="text-xs text-slate-500">New faculty/staff</p>
+              <div className="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2">
+                <div
+                  className="bg-primary/20 h-2 rounded-full"
+                  style={{ width: "45%" }}
+                ></div>
               </div>
-            </Link>
+            </div>
           </div>
         </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pb-6">
+        <Link
+          className="group bg-white dark:bg-[#151f2b] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-primary dark:hover:border-primary transition-all flex items-center gap-4"
+          to="/admin/dashboard"
+        >
+          <div className="h-10 w-10 rounded-lg bg-orange-50 dark:bg-orange-900/20 text-orange-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <span className="material-icons-outlined">build</span>
+          </div>
+          <div>
+            <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+              Maintenance
+            </h4>
+            <p className="text-xs text-slate-500">Create ticket</p>
+          </div>
+        </Link>
+        <Link
+          className="group bg-white dark:bg-[#151f2b] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-primary dark:hover:border-primary transition-all flex items-center gap-4"
+          to="/admin/rooms"
+        >
+          <div className="h-10 w-10 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <span className="material-icons-outlined">block</span>
+          </div>
+          <div>
+            <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+              Block Room
+            </h4>
+            <p className="text-xs text-slate-500">Restrict access</p>
+          </div>
+        </Link>
+        <Link
+          className="group bg-white dark:bg-[#151f2b] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-primary dark:hover:border-primary transition-all flex items-center gap-4"
+          to="/admin/reports"
+        >
+          <div className="h-10 w-10 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <span className="material-icons-outlined">description</span>
+          </div>
+          <div>
+            <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+              Weekly Report
+            </h4>
+            <p className="text-xs text-slate-500">Download PDF</p>
+          </div>
+        </Link>
+        <Link
+          className="group bg-white dark:bg-[#151f2b] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-primary dark:hover:border-primary transition-all flex items-center gap-4"
+          to="/admin/users"
+        >
+          <div className="h-10 w-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
+            <span className="material-icons-outlined">person_add</span>
+          </div>
+          <div>
+            <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+              Add User
+            </h4>
+            <p className="text-xs text-slate-500">New faculty/staff</p>
+          </div>
+        </Link>
+      </div>
+    </div>
   );
 };
