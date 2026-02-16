@@ -1,72 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { UserLayout } from "../components/layouts/UserLayout";
 
 export const RoomSchedulePage: React.FC = () => {
   return (
-    <div className="font-display bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 min-h-screen flex flex-col">
-      <nav className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex">
-              <div className="flex-shrink-0 flex items-center gap-2">
-                <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white">
-                  <span className="material-icons text-xl">school</span>
-                </div>
-                <span className="font-bold text-lg tracking-tight">
-                  Campus<span className="text-primary">Book</span>
-                </span>
-              </div>
-              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                <Link
-                  className="border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                  to="/dashboard"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  className="border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                  to="/rooms"
-                >
-                  Daftar Ruangan
-                </Link>
-                <Link
-                  className="border-primary text-slate-700 dark:text-slate-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                  to="/rooms/schedule"
-                >
-                  Jadwal Saya
-                </Link>
-                <Link
-                  className="border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                  to="/bookings"
-                >
-                  Riwayat Booking
-                </Link>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link
-                className="bg-primary text-white px-4 py-2 rounded text-sm font-medium hover:bg-primary-dark transition-colors shadow-sm"
-                to="/booking/create"
-              >
-                Create Booking
-              </Link>
-              <Link
-                to="/profile"
-                aria-label="Profile"
-                className="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border border-slate-300 dark:border-slate-600"
-              >
-                <img
-                  alt="User Profile"
-                  className="h-full w-full object-cover"
-                  data-alt="User avatar placeholder"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEJpwk1X5cto9kdcjKKXju0d1ycpCRKodoxbOYXl6kgAQVN7GkCX6jOSukwVr92wjSF-wGFT4CcCSNaHYPCwRrpJWciFQ2nE5cqzZTJQ9On2KRpR7qz3QTMqJVHts2StfgogUZLeMXV4gqsGSHCrxvzV1KSgy6_m1-4g2T0OS5nZiX2mipVd8TwYSW3Xe-yXsXBVwa9EAHIGl2NDrJejSlPBKVYUcrX_iIg33U7X7u9pdVM57CKm-5efcEM1GoD5g9o5BFoDrCszY"
-                />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-      <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+    <UserLayout headerTitle="Jadwal Saya">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         <nav aria-label="Breadcrumb" className="flex mb-6">
           <ol className="flex items-center space-x-2 text-sm text-slate-500 dark:text-slate-400">
             <li>
@@ -445,7 +384,7 @@ export const RoomSchedulePage: React.FC = () => {
             </div>
           </div>
         </div>
-      </main>
+      </div>
       <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
@@ -474,6 +413,6 @@ export const RoomSchedulePage: React.FC = () => {
           </div>
         </div>
       </footer>
-    </div>
+    </UserLayout>
   );
 };

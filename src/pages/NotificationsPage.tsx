@@ -1,66 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { UserLayout } from "../components/layouts/UserLayout";
 
 export const NotificationsPage: React.FC = () => {
   return (
-    <div className="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-display">
-      <nav className="bg-surface-light dark:bg-surface-dark border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex">
-              <div className="flex-shrink-0 flex items-center">
-                <span className="text-primary font-bold text-xl tracking-tight">
-                  BookingKampus
-                </span>
-              </div>
-              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                <Link
-                  className="border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                  to="/dashboard"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  className="border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                  to="/rooms/schedule"
-                >
-                  Kalender
-                </Link>
-                <Link
-                  className="border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                  to="/rooms"
-                >
-                  Ruangan
-                </Link>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link
-                aria-label="Notifications"
-                className="p-1 rounded-full text-slate-400 hover:text-slate-500 focus:outline-none relative"
-                to="/notifications"
-              >
-                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-danger ring-2 ring-white dark:ring-surface-dark"></span>
-                <span className="material-icons-round">notifications</span>
-              </Link>
-              <Link
-                to="/profile"
-                aria-label="Profile"
-                className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden border border-primary/20"
-              >
-                <img
-                  alt="Profile"
-                  className="h-full w-full object-cover"
-                  data-alt="Portrait of a young user"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTUyJctkn1SFAFa5EcUKfiS_xbUzMQWSCbvWYYt9wfBI5nrjfT9Qqb2wL_ozsgT2eDVOCagTNJ6hZBwtOAuXLVaysSrM30UANDFL9McmCB5VaJeEzVALd-ixUU7dL7I4sByxuK5vGLe88i5YxqrxTZF0eneGithpv02TicbeYeQUNdoFAgW-Lpl9veqBNQDduAwehEXKI1-i-g2rm0hvti-pSmzKx4bz8QqxodLEqR2asOPlgV2412VQLFkXK8dAYZGBEH5hHE_ss"
-                />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <main className="flex-grow py-8 px-4 sm:px-6 lg:px-8">
+    <UserLayout headerTitle="Notifikasi">
+      <div className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
             <div>
@@ -259,7 +204,7 @@ export const NotificationsPage: React.FC = () => {
             </button>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </UserLayout>
   );
 };

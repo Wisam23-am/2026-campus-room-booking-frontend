@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { bookingService } from "../services/booking.service";
 import { RoomBooking, UpdateBookingDto } from "../types";
+import { UserLayout } from "../components/layouts/UserLayout";
 
 export const BookingDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -115,36 +116,40 @@ export const BookingDetailsPage: React.FC = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display antialiased min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mx-auto mb-4"></div>
-          <p className="text-slate-600 dark:text-slate-400">
-            Loading booking details...
-          </p>
+      <UserLayout headerTitle="Booking Details">
+        <div className="flex items-center justify-center py-16">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mx-auto mb-4"></div>
+            <p className="text-slate-600 dark:text-slate-400">
+              Loading booking details...
+            </p>
+          </div>
         </div>
-      </div>
+      </UserLayout>
     );
   }
 
   // Error state or not found
   if (error || !booking) {
     return (
-      <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display antialiased min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-500 mb-4">
-            <span className="material-icons text-6xl">error_outline</span>
+      <UserLayout headerTitle="Booking Details">
+        <div className="flex items-center justify-center py-16">
+          <div className="text-center">
+            <div className="text-red-500 mb-4">
+              <span className="material-icons text-6xl">error_outline</span>
+            </div>
+            <p className="text-slate-600 dark:text-slate-400 mb-4">
+              {error || "Booking not found"}
+            </p>
+            <Link
+              to="/bookings"
+              className="inline-flex items-center px-4 py-2 border border-primary bg-primary text-white rounded-lg hover:bg-primary/90"
+            >
+              Back to Bookings
+            </Link>
           </div>
-          <p className="text-slate-600 dark:text-slate-400 mb-4">
-            {error || "Booking not found"}
-          </p>
-          <Link
-            to="/bookings"
-            className="inline-flex items-center px-4 py-2 border border-primary bg-primary text-white rounded-lg hover:bg-primary/90"
-          >
-            Back to Bookings
-          </Link>
         </div>
-      </div>
+      </UserLayout>
     );
   }
 
@@ -161,61 +166,7 @@ export const BookingDetailsPage: React.FC = () => {
   };
 
   return (
-    <>
-      <nav className="bg-white dark:bg-[#1A2633] border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center gap-4">
-              <div className="flex-shrink-0 flex items-center gap-2">
-                <div className="bg-primary/10 p-2 rounded-lg">
-                  <span className="material-icons text-primary">school</span>
-                </div>
-                <span className="font-bold text-lg tracking-tight">
-                  CampusReserve
-                </span>
-              </div>
-              <div className="hidden sm:ml-6 sm:flex sm:space-x-8 h-full items-center">
-                <Link
-                  className="border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                  to="/dashboard"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  className="border-primary text-primary dark:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                  to="/bookings"
-                >
-                  Bookings
-                </Link>
-                <Link
-                  className="border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                  to="/rooms/schedule"
-                >
-                  Schedule
-                </Link>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link
-                aria-label="Notifications"
-                className="p-1 rounded-full text-slate-400 hover:text-slate-500"
-                to="/notifications"
-              >
-                <span className="material-icons">notifications</span>
-              </Link>
-              <div className="flex items-center gap-2">
-                <Link to="/profile" aria-label="Profile">
-                  <img
-                    alt="User Profile"
-                    className="h-8 w-8 rounded-full object-cover border border-slate-200 dark:border-slate-700"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHh0jha5H8nevJ366yqInciMqI2ySjtvHLPjiGQd1OOMGfxBeiANGomvw3oV24K0EIbp06it-rCzSOn69WG0Aleoaq2Cz3cYDX0K12Z0KBPYsUKDM5EFltk8spjF8E2v_keY2NXxRhJQdj1KE_Cole1lyd8HEXIGnGnTeBDKPPPX3ggZv0Oc9FjBokKPngYJu_rpaqJ67mPRTC_3LMfmiU28qGoQhbErHc-VLxpd50IHuBDqhzMJV0iMirkM1N4onTHWL5C8wI-cg"
-                  />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
+    <UserLayout headerTitle="Booking Details">
       <main className="flex-1 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav aria-label="Breadcrumb" className="flex mb-6">
@@ -534,6 +485,6 @@ export const BookingDetailsPage: React.FC = () => {
           </p>
         </div>
       </footer>
-    </>
+    </UserLayout>
   );
 };

@@ -1,71 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { UserLayout } from "../components/layouts/UserLayout";
 
 export const RoomsListPage: React.FC = () => {
   return (
-    <div className="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-display min-h-screen flex flex-col">
-      {/* Navbar */}
-      <nav className="bg-surface-light dark:bg-surface-dark border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center gap-4">
-              <div className="flex-shrink-0 flex items-center">
-                <div className="flex-shrink-0 flex items-center">
-                  <span className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-bold text-xl">
-                    U
-                  </span>
-                  <span className="ml-2 text-lg font-bold text-slate-900 dark:text-white">
-                    UniBook
-                  </span>
-                </div>
-              </div>
-              <div className="hidden md:flex ml-8 space-x-8">
-                <Link
-                  className="border-b-2 border-transparent text-slate-500 hover:text-primary dark:text-slate-400 hover:border-slate-300 px-1 pt-1 text-sm font-medium"
-                  to="/dashboard"
-                >
-                  Beranda
-                </Link>
-                <Link
-                  className="border-b-2 border-primary text-primary dark:text-primary px-1 pt-1 text-sm font-medium"
-                  to="/rooms"
-                >
-                  Daftar Ruangan
-                </Link>
-                <Link
-                  className="border-b-2 border-transparent text-slate-500 hover:text-primary dark:text-slate-400 hover:border-slate-300 px-1 pt-1 text-sm font-medium"
-                  to="/rooms/schedule"
-                >
-                  Jadwal Saya
-                </Link>
-              </div>
-            </div>
-            <div className="flex items-center">
-              <Link
-                className="p-2 rounded-full text-slate-400 hover:text-slate-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-                to="/notifications"
-                aria-label="Notifications"
-              >
-                <span className="sr-only">View notifications</span>
-                <span className="material-icons">notifications</span>
-              </Link>
-              <Link
-                className="ml-3 relative flex items-center gap-2 cursor-pointer"
-                to="/profile"
-                aria-label="Profile"
-              >
-                <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm">
-                  JS
-                </div>
-                <span className="hidden sm:block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  John Student
-                </span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
+    <UserLayout headerTitle="Daftar Ruangan">
       {/* Main Content */}
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         {/* Page Header */}
@@ -649,6 +588,6 @@ export const RoomsListPage: React.FC = () => {
           </div>
         </div>
       </main>
-    </div>
+    </UserLayout>
   );
 };
