@@ -55,15 +55,16 @@ export interface User {
 }
 
 export interface Room {
-  id?: number;
+  id: number;
   name: string;
   building: string;
   floor: number;
   capacity: number;
   category: string;
   description?: string;
-  amenities?: string[];
-  status?: 'active' | 'inactive';
+  status: 0 | 1; // 0 = Active, 1 = Inactive
+  createdAt: string;
+  updatedAt?: string;
 }
 
 export interface BookingQueryParams {

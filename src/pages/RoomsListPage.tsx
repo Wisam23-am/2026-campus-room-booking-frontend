@@ -48,15 +48,13 @@ export const RoomsListPage: React.FC = () => {
   };
 
   const statusColors = {
-    active:
-      "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200",
-    inactive:
-      "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-200",
+    0: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200", // Active
+    1: "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-200", // Inactive
   };
 
   const statusLabels = {
-    active: "Available",
-    inactive: "Inactive",
+    0: "Available", // Active
+    1: "Inactive", // Inactive
   };
 
   if (loading && rooms.length === 0) {
@@ -203,10 +201,10 @@ export const RoomsListPage: React.FC = () => {
                     </div>
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        statusColors[room.status || "active"]
+                        statusColors[room.status]
                       }`}
                     >
-                      {statusLabels[room.status || "active"]}
+                      {statusLabels[room.status]}
                     </span>
                   </div>
 

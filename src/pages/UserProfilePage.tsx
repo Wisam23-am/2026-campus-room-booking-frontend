@@ -20,13 +20,13 @@ export const UserProfilePage: React.FC = () => {
         setLoading(true);
         setError(null);
         const currentUser = authService.getCurrentUser();
-        
+
         if (!currentUser) {
           setError("Anda belum login. Silakan login terlebih dahulu.");
           setLoading(false);
           return;
         }
-        
+
         if (!currentUser.id) {
           setError("Data pengguna tidak valid. Silakan login ulang.");
           setLoading(false);
@@ -38,7 +38,8 @@ export const UserProfilePage: React.FC = () => {
         setFormData(data);
       } catch (err) {
         console.error("Failed to fetch user profile:", err);
-        const errorMessage = err instanceof Error ? err.message : "Gagal memuat profil pengguna";
+        const errorMessage =
+          err instanceof Error ? err.message : "Gagal memuat profil pengguna";
         setError(errorMessage);
       } finally {
         setLoading(false);
@@ -64,7 +65,10 @@ export const UserProfilePage: React.FC = () => {
     try {
       setSaving(true);
       setError(null);
-      const updatedUser = await authService.updateCurrentUser(formData.fullName, formData.email);
+      const updatedUser = await authService.updateCurrentUser(
+        formData.fullName,
+        formData.email,
+      );
       setUser(updatedUser);
       setIsEditing(false);
       setSuccess(true);
@@ -137,7 +141,9 @@ export const UserProfilePage: React.FC = () => {
       <div className="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center">
         <div className="max-w-md w-full mx-4">
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-6 text-center">
-            <span className="material-icons text-6xl text-slate-400 mb-4">person_off</span>
+            <span className="material-icons text-6xl text-slate-400 mb-4">
+              person_off
+            </span>
             <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-2">
               Profil Tidak Ditemukan
             </h2>
