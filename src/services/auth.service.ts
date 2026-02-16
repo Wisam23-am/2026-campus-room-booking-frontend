@@ -49,6 +49,21 @@ export const authService = {
     localStorage.removeItem(CURRENT_USER_KEY);
   },
 
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    try {
+      await apiClient.post('/api/auth/change-password', {
+        currentPassword,
+        newPassword,
+      });
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Gagal mengganti password';
+      throw new Error(message);
+    }
+  },
+
   getToken(): string | null {
     return localStorage.getItem(AUTH_TOKEN_KEY);
   },
