@@ -3,148 +3,51 @@ import { Link } from "react-router-dom";
 
 export const AdminLogsPage: React.FC = () => {
   return (
-    <div className="bg-background-light dark:bg-background-dark font-display text-slate-600 dark:text-slate-300 antialiased min-h-screen flex flex-col">
-      {/* Navbar / Top Header */}
-      <header className="bg-surface-light dark:bg-surface-dark border-b border-border-light dark:border-border-dark h-16 sticky top-0 z-30 flex items-center justify-between px-6 shadow-sm">
-        <div className="flex items-center gap-4">
-          <button
-            className="p-2 -ml-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-            type="button"
-          >
-            <span className="material-icons">menu</span>
-          </button>
-          <div className="flex items-center gap-2">
-            <div className="bg-primary/10 p-1.5 rounded-lg">
-              <span className="material-icons text-primary text-xl">
-                admin_panel_settings
+    <div className="p-4 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Page Header & Actions */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <nav className="flex items-center text-sm text-slate-500 mb-1">
+              <Link
+                className="hover:text-primary cursor-pointer"
+                to="/admin/dashboard"
+              >
+                Dashboard
+              </Link>
+              <span className="material-icons text-[14px] mx-1">
+                chevron_right
               </span>
-            </div>
-            <h1 className="font-semibold text-slate-800 dark:text-white text-lg tracking-tight">
-              Admin Portal
-            </h1>
+              <span className="text-slate-800 dark:text-slate-200 font-medium">
+                Log Aktivitas
+              </span>
+            </nav>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+              Log Aktivitas Sistem
+            </h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+              Pantau semua aktivitas pengguna dan perubahan data sistem demi
+              transparansi.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
+              to="/admin/logs/export"
+            >
+              <span className="material-icons text-[18px]">download</span>
+              Ekspor CSV
+            </Link>
+            <button
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-lg shadow-sm shadow-primary/30 transition-colors"
+              onClick={() => window.print()}
+              type="button"
+            >
+              <span className="material-icons text-[18px]">print</span>
+              Cetak Laporan
+            </button>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <button
-            className="relative p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
-            type="button"
-          >
-            <span className="material-icons">notifications</span>
-            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
-          <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/30">
-            <img
-              alt="Admin avatar"
-              className="w-full h-full object-cover"
-              data-alt="Admin user avatar placeholder"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuACwmgx8yiwcqveNpf-7ylFy4Sb54WUsLm3_Aibun7duahvgT8_HPF365u43J0_4ZMjAZxnQaBuo75y2Qygq6gx0wZodv6eBEs7Ol9oD2sjTkoj4pPgT_AjGbpP_WBvAdBg9Pf_d-nDV-7yGFz2aTHdiTaJLNAmYapp-qbY7z5kbFdXLmLJFGCcRSj-WS8kd0dr80DxeLe5e7mGiHunkSzPjO85ovNDlwWjVtV2lylH-PYBQA1Ef7x1eAYYttF_yDBRnyDFwoxQET4"
-            />
-          </div>
-        </div>
-      </header>
-
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar Navigation */}
-        <aside className="w-64 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark hidden lg:flex flex-col overflow-y-auto">
-          <div className="p-4 space-y-1">
-            <p className="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 mt-2">
-              Main Menu
-            </p>
-            <Link
-              className="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
-              to="/admin/dashboard"
-            >
-              <span className="material-icons text-[20px]">dashboard</span>
-              <span className="text-sm font-medium">Dashboard</span>
-            </Link>
-            <Link
-              className="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
-              to="/admin/approvals"
-            >
-              <span className="material-icons text-[20px]">calendar_month</span>
-              <span className="text-sm font-medium">Manajemen Booking</span>
-            </Link>
-            <Link
-              className="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
-              to="/admin/rooms"
-            >
-              <span className="material-icons text-[20px]">meeting_room</span>
-              <span className="text-sm font-medium">Daftar Ruangan</span>
-            </Link>
-            <Link
-              className="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
-              to="/admin/users"
-            >
-              <span className="material-icons text-[20px]">group</span>
-              <span className="text-sm font-medium">Pengguna</span>
-            </Link>
-
-            <p className="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 mt-6">
-              Sistem &amp; Audit
-            </p>
-            <Link
-              className="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary border-r-4 border-primary rounded-l-lg transition-colors"
-              to="/admin/logs"
-            >
-              <span className="material-icons text-[20px]">history</span>
-              <span className="text-sm font-medium">Log Aktivitas</span>
-            </Link>
-            <Link
-              className="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
-              to="/admin/settings"
-            >
-              <span className="material-icons text-[20px]">settings</span>
-              <span className="text-sm font-medium">Pengaturan</span>
-            </Link>
-          </div>
-        </aside>
-
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-8">
-          <div className="max-w-7xl mx-auto space-y-6">
-            {/* Page Header & Actions */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <nav className="flex items-center text-sm text-slate-500 mb-1">
-                  <Link
-                    className="hover:text-primary cursor-pointer"
-                    to="/admin/dashboard"
-                  >
-                    Dashboard
-                  </Link>
-                  <span className="material-icons text-[14px] mx-1">
-                    chevron_right
-                  </span>
-                  <span className="text-slate-800 dark:text-slate-200 font-medium">
-                    Log Aktivitas
-                  </span>
-                </nav>
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-                  Log Aktivitas Sistem
-                </h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                  Pantau semua aktivitas pengguna dan perubahan data sistem demi
-                  transparansi.
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <Link
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
-                  to="/admin/logs/export"
-                >
-                  <span className="material-icons text-[18px]">download</span>
-                  Ekspor CSV
-                </Link>
-                <button
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-lg shadow-sm shadow-primary/30 transition-colors"
-                  onClick={() => window.print()}
-                  type="button"
-                >
-                  <span className="material-icons text-[18px]">print</span>
-                  Cetak Laporan
-                </button>
-              </div>
-            </div>
 
             {/* Filter Card */}
             <div className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-xl p-5 shadow-sm">
@@ -630,9 +533,7 @@ export const AdminLogsPage: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
-        </main>
-      </div>
+        </div>
     </div>
   );
 };
