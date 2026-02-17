@@ -663,10 +663,6 @@ See [CHANGELOG.md](CHANGELOG.md)
 - [Backend API](https://github.com/Wisam23-am/2026-campus-room-booking-backend)
 - [Documentation](https://github.com/Wisam23-am/2026-campus-room-booking-docs)
 
-## 📄 License
-
-MIT License - see LICENSE file for details
-
 ---
 
-**Made with ❤️ using React + TypeScript + Tailwind CSS**
+**Made using React + TypeScript + Tailwind CSS**
