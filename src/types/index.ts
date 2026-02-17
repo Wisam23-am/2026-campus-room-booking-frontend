@@ -45,23 +45,26 @@ export interface PaginatedResponse<T> {
 }
 
 export interface User {
-  id: string;
-  name: string;
+  id: number;
+  fullName: string;
   email: string;
-  role: 'user' | 'admin';
+  role: 0 | 1;
+  createdAt: string;
+  updatedAt?: string;
   token?: string;
 }
 
 export interface Room {
-  id?: number;
+  id: number;
   name: string;
   building: string;
   floor: number;
   capacity: number;
   category: string;
   description?: string;
-  amenities?: string[];
-  status?: 'active' | 'inactive';
+  status: 0 | 1; // 0 = Active, 1 = Inactive
+  createdAt: string;
+  updatedAt?: string;
 }
 
 export interface BookingQueryParams {

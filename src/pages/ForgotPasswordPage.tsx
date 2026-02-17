@@ -1,7 +1,14 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const ForgotPasswordPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    navigate("/login");
+  };
+
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 min-h-screen flex flex-col font-display antialiased transition-colors duration-300">
       <header className="w-full px-6 py-4 absolute top-0 left-0 z-10 flex justify-between items-center">
@@ -48,7 +55,12 @@ export const ForgotPasswordPage: React.FC = () => {
                 mengirimkan link untuk mereset kata sandi.
               </p>
             </div>
-            <form action="#" className="space-y-6" method="POST">
+            <form
+              action="#"
+              className="space-y-6"
+              method="POST"
+              onSubmit={handleSubmit}
+            >
               <div>
                 <label
                   className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5"

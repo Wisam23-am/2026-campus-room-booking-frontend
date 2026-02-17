@@ -23,13 +23,13 @@ export const NotFoundPage: React.FC = () => {
             <nav className="hidden md:flex space-x-8">
               <Link
                 className="text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
-                to="/rooms/schedule"
+                to="/rooms"
               >
                 Cari Ruangan
               </Link>
               <Link
                 className="text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
-                to="/bookings"
+                to="/rooms"
               >
                 Jadwal Saya
               </Link>
@@ -113,7 +113,7 @@ export const NotFoundPage: React.FC = () => {
               </Link>
               <Link
                 className="inline-flex items-center justify-center px-8 py-4 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 font-medium rounded-xl transition-colors w-full sm:w-auto"
-                to="/rooms/schedule"
+                to="/rooms"
               >
                 <span className="material-icons mr-2 text-xl">search</span>
                 Cari Ruangan Lain
@@ -126,14 +126,14 @@ export const NotFoundPage: React.FC = () => {
               <div className="flex justify-center gap-6">
                 <Link
                   className="text-sm text-primary hover:text-blue-600 dark:hover:text-blue-400 font-medium flex items-center gap-1"
-                  to="/admin/dashboard"
+                  to="/dashboard"
                 >
                   <span className="material-icons text-sm">support_agent</span>
                   Kontak Admin
                 </Link>
                 <Link
                   className="text-sm text-primary hover:text-blue-600 dark:hover:text-blue-400 font-medium flex items-center gap-1"
-                  to="/rooms/schedule"
+                  to="/rooms"
                 >
                   <span className="material-icons text-sm">map</span>
                   Peta Kampus

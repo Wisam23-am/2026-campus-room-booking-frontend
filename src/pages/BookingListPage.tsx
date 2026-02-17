@@ -133,41 +133,8 @@ export const BookingListPage: React.FC = () => {
     totalCount === 0 ? 0 : (currentPage - 1) * pageSize + bookings.length;
 
   return (
-    <div className="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-display min-h-screen">
-      <nav className="sticky top-0 z-50 bg-white dark:bg-[#1a2634] border-b border-slate-200 dark:border-slate-700 h-16 flex items-center px-6 justify-between shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-bold text-lg">
-            C
-          </div>
-          <span className="font-semibold text-lg tracking-tight">
-            CampusBook
-          </span>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link
-            aria-label="Notifications"
-            className="p-2 text-slate-500 hover:text-primary transition-colors"
-            to="/notifications"
-          >
-            <span className="material-icons">notifications</span>
-          </Link>
-          <div className="w-8 h-8 rounded-full bg-slate-200 overflow-hidden">
-            <Link
-              to="/profile"
-              aria-label="Profile"
-              className="block w-full h-full"
-            >
-              <img
-                alt="User Avatar"
-                className="w-full h-full object-cover"
-                data-alt="Portrait of a young male student"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4G5o4DiQMrncTc5Bo-DJ1WVALq3R23fOyu1fgwIeMg919SZ0zCkxHjLG7eDB8_6GTgzK-XcrSwMqVREEZK1ItBuKRnfPyGqZ2MQAR22ZTmFFuug8R_7kvkYt2P1H6CMdBNn-r6mQ1Vtoz7pTMdM7coEd3djglatTg3Yu3e1iO82CmjjIP0Wfq-RX041k6tuz3aAa6nOTUePcPUpg9DpWwHvHxbLYT2AUHGy9imhXNES2aPMLXeXJIquBVE2SjLQdn-rm6hHPwd8w"
-              />
-            </Link>
-          </div>
-        </div>
-      </nav>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <nav
@@ -208,7 +175,7 @@ export const BookingListPage: React.FC = () => {
           </div>
           <Link
             className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded shadow-sm text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
-            to="/bookings/create"
+            to="/booking/create"
           >
             <span className="material-icons text-sm mr-2">add</span>
             New Booking
@@ -380,7 +347,7 @@ export const BookingListPage: React.FC = () => {
                             <Link
                               className="text-slate-400 hover:text-primary transition-colors"
                               title="View Details"
-                              to={`/bookings/details?id=${booking.id}`}
+                              to={`/bookings/${booking.id}`}
                             >
                               <span className="material-icons text-xl">
                                 visibility
@@ -485,12 +452,7 @@ export const BookingListPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </main>
-      <footer className="mt-8 border-t border-slate-200 dark:border-slate-700 py-6 text-center">
-        <p className="text-sm text-slate-500">
-          (c) 2023 CampusBook System. All rights reserved.
-        </p>
-      </footer>
+      </div>
     </div>
   );
 };
